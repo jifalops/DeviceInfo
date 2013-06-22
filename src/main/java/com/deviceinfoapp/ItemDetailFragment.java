@@ -2,7 +2,10 @@ package com.deviceinfoapp;
 
 import android.app.ListFragment;
 import android.os.Bundle;
-import android.widget.ListAdapter;
+
+import com.deviceinfoapp.adapter.ElementAdapter;
+import com.deviceinfoapp.element.Audio;
+import com.deviceinfoapp.element.Element;
 
 /**
  * A fragment representing a single Item detail screen.
@@ -43,7 +46,8 @@ public class ItemDetailFragment extends ListFragment {
      */
     private int mItem;
 
-    private ListAdapter mAdapter;
+    private Element mElement;
+    private ElementAdapter mAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -88,7 +92,9 @@ public class ItemDetailFragment extends ListFragment {
 
                     break;
                 case AUDIO:
-
+                    mElement = new Audio(getActivity());
+                    mAdapter = new ElementAdapter(getActivity(), mElement);
+                    setListAdapter(mAdapter);
                     break;
                 case GRAPHICS:
 
