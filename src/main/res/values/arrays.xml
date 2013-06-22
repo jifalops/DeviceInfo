@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="main_items">
+        <item>Processors</item>
+        <item>RAM</item>
+        <item>Storage</item>
+        <item>Display</item>
+        <item>Cameras</item>
+        <item>Battery</item>
+        <item>Sensors</item>
+        <item>Audio</item>
+        <item>Graphics</item>
+        <item>Location</item>
+        <item>Network</item>
+        <item>Cellular</item>
+        <item>WiFi</item>
+        <item>Bluetooth</item>
+        <item>Uptime</item>
+        <item>Platform</item>
+        <item>Identifiers</item>
+        <item>Features</item>
+        <item>Properties</item>
+        <item>Keys</item>
+    </string-array>
+    <string-array name="themes">
+        <item>Dark</item>
+        <item>Light</item>
+        <item>Light with Dark Action Bar</item>
+    </string-array>
+</resources>

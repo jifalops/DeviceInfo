@@ -18,3 +18,24 @@ local.properties
 # Eclipse project files
 .classpath
 .project
+.settings
+
+# Intellij / Android Studio files
+.idea
+*.iml
+build
+build.gradle
+
+
+
+# OS garbage
+Thumbs.db
+.DS_Store
+
+# File locks
+.~*
+~*
+
+# Private stuff
+.private
+Private.java
