@@ -1,8 +1,8 @@
 package com.deviceinfoapp.element;
 
-import java.util.LinkedHashMap;
-
 import android.content.Context;
+
+import java.util.LinkedHashMap;
 
 public abstract class ListeningElement extends Element implements ElementListener {
 
@@ -66,7 +66,7 @@ public abstract class ListeningElement extends Element implements ElementListene
 	@Override
 	public LinkedHashMap<String, String> getContents() {
 		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-		contents.put("Is Listening", String.valueOf(mIsListening));
+//		contents.put("Is Listening", String.valueOf(mIsListening));
 		return contents;
 	}
 }

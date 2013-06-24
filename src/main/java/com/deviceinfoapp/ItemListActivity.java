@@ -1,6 +1,5 @@
 package com.deviceinfoapp;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -21,7 +20,7 @@ import android.os.Bundle;
  * {@link ItemListFragment.Callbacks} interface
  * to listen for item selections.
  */
-public class ItemListActivity extends Activity
+public class ItemListActivity extends BaseActivity
         implements ItemListFragment.Callbacks {
 
     /**

@@ -10,20 +10,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Medium Text"
             android:id="@+id/text1"
             android:paddingRight="8dp"
-            android:layout_weight="1"
-            android:autoText="false"/>
+            android:autoText="false"
+            android:layout_weight="0.5"
+            android:minWidth="160dp"/>
 
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Small Text"
             android:id="@+id/text2"
             android:paddingLeft="8dp"
-            android:layout_weight="1"
             android:gravity="end"
-            android:autoText="false"/>
+            android:autoText="false"
+            android:layout_weight="0.5"
+            android:minWidth="160dp"/>
 </LinearLayout>

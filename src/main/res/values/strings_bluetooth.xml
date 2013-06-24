@@ -6,7 +6,7 @@
     <string name="bluetooth_profile_health">Health</string>
     <string name="bluetooth_state_connected">Connected</string>
     <string name="bluetooth_state_connecting">Connecting</string>
-    <string name="bluetooth_state_disconnected">Discnnected</string>
+    <string name="bluetooth_state_disconnected">Disconnected</string>
     <string name="bluetooth_state_disconnecting">Disconnecting</string>
     
 	<!-- BluetoothA2dp constants -->
@@ -15,7 +15,7 @@
 	
 	<!-- BluetoothAdapter constants -->
     <string name="bluetooth_error">Error</string>
-    <string name="bluetooth_mode_connectable">Connectable</string>
+    <string name="bluetooth_mode_connectable">Connectible</string>
     <string name="bluetooth_mode_connectable_discoverable">Discoverable</string>
     <string name="bluetooth_mode_none">None</string>    
     <string name="bluetooth_state_off">Off</string>

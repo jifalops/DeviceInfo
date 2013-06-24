@@ -192,18 +192,16 @@ public class Battery extends ListeningElement {
 	@Override
 	public LinkedHashMap<String, String> getContents() {
 		LinkedHashMap<String, String> contents = super.getContents();
-		
-		contents.put("Event Timestamp", String.valueOf(getTimestamp()));
-		contents.put("Battery Is Present", String.valueOf(isBatteryPresent()));
-		contents.put("Level", String.valueOf(getLevel()));
-		contents.put("Level Max", String.valueOf(getLevelMax()));
-		contents.put("Voltage (mV)", String.valueOf(getVoltage()));
-		contents.put("Temperature (C)", String.valueOf(getTemperature()));
-		contents.put("Technology", getTechnology());
-		contents.put("Status", getStatusString());
-		contents.put("Health", getHealthString());
-		contents.put("Plugged In Status", getPluggedInStatusString());
-		contents.put("Icon Resource ID", String.valueOf(getIconResourceId()));
+
+        contents.put("Level", getLevel() + "/" + getLevelMax());
+        contents.put("Temperature (C)", String.valueOf(getTemperature()));
+        contents.put("Status", getStatusString());
+        contents.put("Plugged In Status", getPluggedInStatusString());
+        contents.put("Voltage (mV)", String.valueOf(getVoltage()));
+        contents.put("Technology", getTechnology());
+        contents.put("Health", getHealthString());
+        contents.put("Battery Is Present", String.valueOf(isBatteryPresent()));
+//		contents.put("Icon Resource ID", String.valueOf(getIconResourceId()));
 		
 		return contents;
 	}

@@ -27,6 +27,11 @@ public class ElementAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mElement = element;
         mContents = new ArrayList<Pair<String, String>>();
+        update();
+    }
+
+    public void update() {
+        mContents.clear();
         for (Map.Entry<String, String> e : mElement.getContents().entrySet()) {
             mContents.add(new Pair<String, String>(e.getKey(), e.getValue()));
         }

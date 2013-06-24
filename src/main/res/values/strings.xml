@@ -36,4 +36,11 @@
 
     <string name="timestamp_filename">yyyy-MM-dd_HH-mm-ssZ</string>
     <string name="timestamp_display">yyyy-MM-dd HH:mm:ssZ</string>
+
+    <string name="menu_settings">Settings</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_playpause">Play/Pause</string>
+    <string name="menu_indicator">Change Indicator</string>
+
+    <string name="about">About</string>
 </resources>
