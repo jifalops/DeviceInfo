@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="minWidth">300dp</dimen>
+    <dimen name="itemMinWidth">300dp</dimen>
 </resources>

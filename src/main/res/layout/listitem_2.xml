@@ -4,26 +4,26 @@
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:padding="16dp"
+              android:padding="@dimen/itemPadding"
               android:gravity="center_vertical">
     <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/text1"
             android:paddingRight="8dp"
-            android:autoText="false"
+            android:textIsSelectable="true"
             android:layout_weight="0.5"
-            android:minWidth="160dp"/>
+            android:minWidth="@dimen/itemMinWidth"/>
 
     <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/text2"
             android:paddingLeft="8dp"
+            android:textIsSelectable="true"
             android:gravity="end"
-            android:autoText="false"
             android:layout_weight="0.5"
-            android:minWidth="160dp"/>
+            android:minWidth="@dimen/itemMinWidth"/>
 </LinearLayout>

@@ -1,22 +1,26 @@
 package com.deviceinfoapp;
 
-import android.app.ListFragment;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
-import com.deviceinfoapp.adapter.ElementAdapter;
-import com.deviceinfoapp.element.Audio;
-import com.deviceinfoapp.element.Battery;
-import com.deviceinfoapp.element.Bluetooth;
-import com.deviceinfoapp.element.Element;
-import com.deviceinfoapp.element.ListeningElement;
-import com.deviceinfoapp.element.UnavailableFeatureException;
+import com.deviceinfoapp.adapter.ModelAdapter;
+import com.deviceinfoapp.model.Audio;
+import com.deviceinfoapp.model.Battery;
+import com.deviceinfoapp.model.Bluetooth;
+import com.deviceinfoapp.model.Element;
+import com.deviceinfoapp.model.ListeningElement;
+import com.deviceinfoapp.model.UnavailableFeatureException;
+import com.deviceinfoapp.util.GroupedListItems;
+import com.deviceinfoapp.util.PinnedHeaderExpandableListFragment;
 
 /**
  * A fragment representing a single Item detail screen.
@@ -24,7 +28,7 @@ import com.deviceinfoapp.element.UnavailableFeatureException;
  * in two-pane mode (on tablets) or a {@link ItemDetailActivity}
  * on handsets.
  */
-public class ItemDetailFragment extends ListFragment implements Battery.Callback, Bluetooth.Callback {
+public class ItemDetailFragment extends PinnedHeaderExpandableListFragment implements Battery.Callback, Bluetooth.Callback {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -62,7 +66,7 @@ public class ItemDetailFragment extends ListFragment implements Battery.Callback
     private boolean mIsPlayable, mIsPlaying;
     private MenuItem mIndicatorMenuItem, mPlayPauseMenuItem;
     private Handler mHandler;
-    private ElementAdapter mAdapter;
+    //private ModelAdapter mAdapter;
     private boolean mIsShowing;
     private boolean mPlayImmediately;
 
@@ -78,6 +82,15 @@ public class ItemDetailFragment extends ListFragment implements Battery.Callback
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         mHandler = new Handler();
+
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = super.onCreateView(inflater, container, savedInstanceState);
+
+        GroupedListItems info = null;
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
@@ -98,7 +111,9 @@ public class ItemDetailFragment extends ListFragment implements Battery.Callback
                     mPlayImmediately = true;
                     break;
                 case SENSORS: break;
-                case AUDIO: mElement = new Audio(getActivity());
+                case AUDIO:
+                    mElement = new Audio(getActivity());
+                    info = ((Audio) mElement).getGroupedContents();
                     break;
                 case GRAPHICS: break;
                 case LOCATION: break;
@@ -126,10 +141,17 @@ public class ItemDetailFragment extends ListFragment implements Battery.Callback
                     mIsPlayable = true;
                     ((ListeningElement) mElement).setCallback(this);
                 }
-                mAdapter = new ElementAdapter(getActivity(), mElement);
-                setListAdapter(mAdapter);
+
+                ModelAdapter ma = new ModelAdapter(getActivity(), mElement);
+
+                if (info != null) ma.setChildren(info);
+
+                setAdapter(ma);
+
             }
         }
+
+        return root;
     }
 
     @Override
@@ -233,8 +255,8 @@ public class ItemDetailFragment extends ListFragment implements Battery.Callback
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        mAdapter.update();
-        mAdapter.notifyDataSetChanged();
+        ((ModelAdapter) getAdapter()).update();
+        getAdapter().notifyDataSetChanged();
         showIndicator();
     }
 
@@ -244,15 +266,15 @@ public class ItemDetailFragment extends ListFragment implements Battery.Callback
 
     @Override
     public void onServiceConnected(int profile, BluetoothProfile proxy) {
-        mAdapter.update();
-        mAdapter.notifyDataSetChanged();
+        ((ModelAdapter) getAdapter()).update();
+        getAdapter().notifyDataSetChanged();
         showIndicator();
     }
 
     @Override
     public void onServiceDisconnected(int profile) {
-        mAdapter.update();
-        mAdapter.notifyDataSetChanged();
+        ((ModelAdapter) getAdapter()).update();
+        getAdapter().notifyDataSetChanged();
         showIndicator();
     }
 }
