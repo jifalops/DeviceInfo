@@ -71,7 +71,7 @@ public class PinnedHeaderExpandableListAdapter extends BaseExpandableListAdapter
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.listitem_2, parent, false);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_item_2, parent, false);
         }
 
         //TextView textView = getGenericView();
@@ -102,7 +102,7 @@ public class PinnedHeaderExpandableListAdapter extends BaseExpandableListAdapter
         String text = (String) mChildren.getGroupName(groupPosition);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.header, parent, false);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.header_item, parent, false);
         }
 
         convertView = (TextView) convertView;
@@ -144,7 +144,7 @@ public class PinnedHeaderExpandableListAdapter extends BaseExpandableListAdapter
         mPinnedHeaderBackgroundColor = mContext.getResources().getColor(android.R.color.black);
         mPinnedHeaderTextColor = mContext.getResources().getColor(android.R.color.white);
 
-        //header.setText(title);
+        //header_item.setText(title);
         if (alpha == 255) {
             header.setBackgroundColor(mPinnedHeaderBackgroundColor);
             header.setTextColor(mPinnedHeaderTextColor);

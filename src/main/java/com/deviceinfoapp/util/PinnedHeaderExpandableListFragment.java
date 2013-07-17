@@ -57,7 +57,7 @@ public class PinnedHeaderExpandableListFragment extends Fragment {
         mPinnedHeaderTextColor = getResources().getColor(android.R.color.white);
 
         mListView.setGroupIndicator(null);
-        View h = LayoutInflater.from(getActivity()).inflate(R.layout.header, (ViewGroup) root.findViewById(R.id.root), false);
+        View h = LayoutInflater.from(getActivity()).inflate(R.layout.header_item, (ViewGroup) root.findViewById(R.id.root), false);
         mListView.setPinnedHeaderView(h);
 
         //mListView.setDividerHeight(0);
@@ -78,7 +78,7 @@ public class PinnedHeaderExpandableListFragment extends Fragment {
 
                 if (childView.getTop() < mListView.getHeaderViewHeight() * .75) {
                     // if the clicked child item overlaps more than 25%
-                    //  of pinned header, consider it being underneath
+                    //  of pinned header_item, consider it being underneath
                     long groupPackedPos = ExpandableListView.getPackedPositionForGroup(groupPosition);
                     int groupFlatPos = mListView.getFlatListPosition(groupPackedPos);
                     mListView.smoothScrollToPosition(groupFlatPos);

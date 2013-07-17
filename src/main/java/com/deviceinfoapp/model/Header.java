@@ -1,0 +1,17 @@
+package com.deviceinfoapp.model;
+
+import com.deviceinfoapp.R;
+
+/**
+ * Created by Jake on 7/17/13.
+ */
+public class Header extends AbsItem1 {
+    public Header(CharSequence text) {
+        super(text, R.layout.header_item);
+    }
+
+    @Override
+    public int getViewType() {
+        return Item.TYPE_HEADER;
+    }
+}

@@ -5,7 +5,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent" >
 
-    <view class="com.deviceinfoapp.util.PinnedHeaderExpandableListView"
+    <ExpandableListView
           android:id="@+id/list"
           android:layout_width="match_parent"
           android:layout_height="match_parent" />

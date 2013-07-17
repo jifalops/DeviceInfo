@@ -12,15 +12,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.deviceinfoapp.adapter.ModelAdapter;
-import com.deviceinfoapp.model.Audio;
-import com.deviceinfoapp.model.Battery;
-import com.deviceinfoapp.model.Bluetooth;
-import com.deviceinfoapp.model.Element;
-import com.deviceinfoapp.model.ListeningElement;
-import com.deviceinfoapp.model.UnavailableFeatureException;
-import com.deviceinfoapp.util.GroupedListItems;
-import com.deviceinfoapp.util.PinnedHeaderExpandableListFragment;
+import com.deviceinfoapp.element.Audio;
+import com.deviceinfoapp.element.Battery;
+import com.deviceinfoapp.element.Bluetooth;
+import com.deviceinfoapp.element.Element;
+import com.deviceinfoapp.element.ListeningElement;
+import com.deviceinfoapp.element.UnavailableFeatureException;
+import com.deviceinfoapp.model.ExpandableItemArrayAdapter;
+import com.deviceinfoapp.model.Item;
+import com.deviceinfoapp.util.ExpandableListFragment;
+
+import java.util.List;
 
 /**
  * A fragment representing a single Item detail screen.
@@ -28,7 +30,7 @@ import com.deviceinfoapp.util.PinnedHeaderExpandableListFragment;
  * in two-pane mode (on tablets) or a {@link ItemDetailActivity}
  * on handsets.
  */
-public class ItemDetailFragment extends PinnedHeaderExpandableListFragment implements Battery.Callback, Bluetooth.Callback {
+public class ItemDetailFragment extends ExpandableListFragment implements Battery.Callback, Bluetooth.Callback {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -90,7 +92,7 @@ public class ItemDetailFragment extends PinnedHeaderExpandableListFragment imple
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = super.onCreateView(inflater, container, savedInstanceState);
 
-        GroupedListItems info = null;
+        List<Item> info = null;
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
@@ -113,7 +115,7 @@ public class ItemDetailFragment extends PinnedHeaderExpandableListFragment imple
                 case SENSORS: break;
                 case AUDIO:
                     mElement = new Audio(getActivity());
-                    info = ((Audio) mElement).getGroupedContents();
+                    info = ((Audio) mElement).getGroupedContents2();
                     break;
                 case GRAPHICS: break;
                 case LOCATION: break;
@@ -142,11 +144,18 @@ public class ItemDetailFragment extends PinnedHeaderExpandableListFragment imple
                     ((ListeningElement) mElement).setCallback(this);
                 }
 
-                ModelAdapter ma = new ModelAdapter(getActivity(), mElement);
 
-                if (info != null) ma.setChildren(info);
 
-                setAdapter(ma);
+                if (info != null) {
+                    ExpandableItemArrayAdapter adapter = new ExpandableItemArrayAdapter(getActivity());
+
+                    //ModelAdapter ma = new ModelAdapter(getActivity(), mElement);
+                    //ma.setChildren(info);
+                    adapter.setItems(info);
+                    setAdapter(adapter);
+                }
+
+
 
             }
         }
@@ -255,7 +264,7 @@ public class ItemDetailFragment extends PinnedHeaderExpandableListFragment imple
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        ((ModelAdapter) getAdapter()).update();
+        //((ModelAdapter) getAdapter()).update();
         getAdapter().notifyDataSetChanged();
         showIndicator();
     }
@@ -266,14 +275,14 @@ public class ItemDetailFragment extends PinnedHeaderExpandableListFragment imple
 
     @Override
     public void onServiceConnected(int profile, BluetoothProfile proxy) {
-        ((ModelAdapter) getAdapter()).update();
+       // ((ModelAdapter) getAdapter()).update();
         getAdapter().notifyDataSetChanged();
         showIndicator();
     }
 
     @Override
     public void onServiceDisconnected(int profile) {
-        ((ModelAdapter) getAdapter()).update();
+       // getAdapter().update();
         getAdapter().notifyDataSetChanged();
         showIndicator();
     }

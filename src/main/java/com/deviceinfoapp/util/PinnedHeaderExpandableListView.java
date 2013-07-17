@@ -12,8 +12,8 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 
 /**
- * A ListView that maintains a header pinned at the top of the list. The
- * pinned header can be pushed up and dissolved as needed.
+ * A ListView that maintains a header_item pinned at the top of the list. The
+ * pinned header_item can be pushed up and dissolved as needed.
  */
 public class PinnedHeaderExpandableListView extends ExpandableListView {
 
@@ -27,27 +27,27 @@ public class PinnedHeaderExpandableListView extends ExpandableListView {
     public interface PinnedHeaderAdapter {
 
         /**
-         * Pinned header state: don't show the header.
+         * Pinned header_item state: don't show the header_item.
          */
         public static final int PINNED_HEADER_GONE = 0;
 
         /**
-         * Pinned header state: show the header at the top of the list.
+         * Pinned header_item state: show the header_item at the top of the list.
          */
         public static final int PINNED_HEADER_VISIBLE = 1;
 
         /**
-         * Pinned header state: show the header. If the header extends beyond
+         * Pinned header_item state: show the header_item. If the header_item extends beyond
          * the bottom of the first shown element, push it up and clip.
          */
         public static final int PINNED_HEADER_PUSHED_UP = 2;
 
         /**
-         * Configures the pinned header view to match the first visible list item.
+         * Configures the pinned header_item view to match the first visible list item.
          *
-         * @param header pinned header view.
+         * @param header pinned header_item view.
          * @param position position of the first visible list item.
-         * @param alpha fading of the header view, between 0 and 255.
+         * @param alpha fading of the header_item view, between 0 and 255.
          */
         void configurePinnedHeader(View header, int position, int alpha);
     }
@@ -77,7 +77,7 @@ public class PinnedHeaderExpandableListView extends ExpandableListView {
     public void setPinnedHeaderView(View view) {
         mHeaderView = view;
 
-        // Disable vertical fading when the pinned header is present
+        // Disable vertical fading when the pinned header_item is present
         // TODO change ListView to allow separate measures for top and bottom fading edge;
         // in this particular case we would like to disable the top, but not the bottom edge.
         if (mHeaderView != null) {
@@ -112,7 +112,7 @@ public class PinnedHeaderExpandableListView extends ExpandableListView {
     }
 
     /**
-     * animating header pushing
+     * animating header_item pushing
      * @param position
      */
     public void configureHeaderView(int position) {

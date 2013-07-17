@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="itemMinWidth">160dp</dimen>
-    <dimen name="itemPadding">12dp</dimen>
-</resources>
