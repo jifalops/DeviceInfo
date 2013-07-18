@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 
+import com.deviceinfoapp.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,11 +19,8 @@ public class ExpandableItemArrayAdapter extends BaseExpandableListAdapter {
     private LayoutInflater mInflater;
     private GroupedItems mGroupedItems;
 
-    public ExpandableItemArrayAdapter(Context context) {
+    public ExpandableItemArrayAdapter(Context context, List<Item> items) {
         mInflater = LayoutInflater.from(context);
-    }
-
-    public void setItems(List<Item> items) {
         mGroupedItems = new GroupedItems(items);
     }
 
@@ -62,7 +61,11 @@ public class ExpandableItemArrayAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        return ((Item) getGroup(groupPosition)).getView(mInflater, convertView);
+        if (groupPosition == 0) {
+            return mInflater.inflate(R.layout.empty_view, null);
+        } else {
+            return ((Item) getGroup(groupPosition)).getView(mInflater, convertView);
+        }
     }
 
     @Override
@@ -82,7 +85,6 @@ public class ExpandableItemArrayAdapter extends BaseExpandableListAdapter {
 
         private List<Item> mItems;
         private int[][] mGroups;
-        private int mUngroupedItems;
 
 
         public GroupedItems(List<Item> items) {
@@ -91,13 +93,21 @@ public class ExpandableItemArrayAdapter extends BaseExpandableListAdapter {
             List<Integer> groups = findGroups();
             int size = groups.size();
 
-            mGroups = new int[size][2];
+            mGroups = new int[size + 1][2];
+            mGroups[0][POSITION] = 0;
 
             if (size == 0) {
-                mUngroupedItems = mItems.size();
+                mGroups[0][CHILDREN] = mItems.size();
             } else {
-                mUngroupedItems = groups.get(0);
-                populateGroups(groups);
+                int pos = groups.get(0);
+                mGroups[0][CHILDREN] = pos;
+                mGroups[1][POSITION] = pos;
+                for (int i = 1; i < size; ++i) {
+                    pos = groups.get(i);
+                    mGroups[i + 1][POSITION] = pos;
+                    mGroups[i][CHILDREN] = pos - mGroups[i][POSITION] - 1;
+                }
+                mGroups[size][CHILDREN] = mItems.size() - pos - 1;
             }
         }
 
@@ -113,22 +123,6 @@ public class ExpandableItemArrayAdapter extends BaseExpandableListAdapter {
             return groups;
         }
 
-        private void populateGroups(List<Integer> groups) {
-            int size = mGroups.length;
-            int pos = groups.get(0);
-            mGroups[0][POSITION] = pos;
-            for (int i = 1; i < size; ++i) {
-                pos = groups.get(i);
-                mGroups[i][POSITION] = pos;
-                mGroups[i - 1][CHILDREN] = pos - mGroups[i - 1][POSITION] - 1;
-            }
-            mGroups[size - 1][CHILDREN] = mItems.size() - pos - 1;
-        }
-
-        public int getUngroupedItemCount() {
-            return mUngroupedItems;
-        }
-
         public int getGroupCount() {
             return mGroups.length;
         }
@@ -138,11 +132,17 @@ public class ExpandableItemArrayAdapter extends BaseExpandableListAdapter {
         }
 
         public Object getGroup(int groupPosition) {
-            return (Header) mItems.get(mGroups[groupPosition][POSITION]);
+            return mItems.get(mGroups[groupPosition][POSITION]);
         }
 
         public Object getChild(int groupPosition, int childPosition) {
-            return mItems.get(mGroups[groupPosition][POSITION] + childPosition + 1);
+            int pos;
+            if (groupPosition == 0) {
+                pos = childPosition;
+            } else {
+                pos = mGroups[groupPosition][POSITION] + childPosition + 1;
+            }
+            return mItems.get(pos);
         }
 
         public long getGroupId(int groupPosition) {

@@ -1,5 +1,6 @@
 package com.deviceinfoapp;
 
+import android.app.Fragment;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 
 import com.deviceinfoapp.element.Audio;
 import com.deviceinfoapp.element.Battery;
@@ -20,7 +22,6 @@ import com.deviceinfoapp.element.ListeningElement;
 import com.deviceinfoapp.element.UnavailableFeatureException;
 import com.deviceinfoapp.model.ExpandableItemArrayAdapter;
 import com.deviceinfoapp.model.Item;
-import com.deviceinfoapp.util.ExpandableListFragment;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ import java.util.List;
  * in two-pane mode (on tablets) or a {@link ItemDetailActivity}
  * on handsets.
  */
-public class ItemDetailFragment extends ExpandableListFragment implements Battery.Callback, Bluetooth.Callback {
+public class ItemDetailFragment extends Fragment implements Battery.Callback, Bluetooth.Callback {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -68,9 +69,11 @@ public class ItemDetailFragment extends ExpandableListFragment implements Batter
     private boolean mIsPlayable, mIsPlaying;
     private MenuItem mIndicatorMenuItem, mPlayPauseMenuItem;
     private Handler mHandler;
-    //private ModelAdapter mAdapter;
     private boolean mIsShowing;
     private boolean mPlayImmediately;
+
+    private ExpandableItemArrayAdapter mAdapter;
+    protected ExpandableListView mListView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -90,7 +93,14 @@ public class ItemDetailFragment extends ExpandableListFragment implements Batter
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = super.onCreateView(inflater, container, savedInstanceState);
+        if (container == null) {
+            return null;
+        }
+
+        View root = inflater.inflate(R.layout.fragment_item_detail, container, false);
+
+        mListView = (ExpandableListView) root.findViewById(R.id.list);
+       // mListView.setGroupIndicator(null);
 
         List<Item> info = null;
 
@@ -147,12 +157,9 @@ public class ItemDetailFragment extends ExpandableListFragment implements Batter
 
 
                 if (info != null) {
-                    ExpandableItemArrayAdapter adapter = new ExpandableItemArrayAdapter(getActivity());
-
-                    //ModelAdapter ma = new ModelAdapter(getActivity(), mElement);
-                    //ma.setChildren(info);
-                    adapter.setItems(info);
-                    setAdapter(adapter);
+                    mAdapter = new ExpandableItemArrayAdapter(getActivity(), info);
+                    mListView.setAdapter(mAdapter);
+                    mListView.expandGroup(0);
                 }
 
 
@@ -265,7 +272,7 @@ public class ItemDetailFragment extends ExpandableListFragment implements Batter
     @Override
     public void onReceive(Context context, Intent intent) {
         //((ModelAdapter) getAdapter()).update();
-        getAdapter().notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
         showIndicator();
     }
 
@@ -276,14 +283,14 @@ public class ItemDetailFragment extends ExpandableListFragment implements Batter
     @Override
     public void onServiceConnected(int profile, BluetoothProfile proxy) {
        // ((ModelAdapter) getAdapter()).update();
-        getAdapter().notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
         showIndicator();
     }
 
     @Override
     public void onServiceDisconnected(int profile) {
        // getAdapter().update();
-        getAdapter().notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
         showIndicator();
     }
 }
