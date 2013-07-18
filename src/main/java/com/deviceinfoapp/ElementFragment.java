@@ -1,11 +1,11 @@
 package com.deviceinfoapp;
 
-import android.app.Fragment;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import com.deviceinfoapp.data.Elements;
 import com.deviceinfoapp.element.Audio;
 import com.deviceinfoapp.element.Battery;
 import com.deviceinfoapp.element.Bluetooth;
@@ -31,38 +32,12 @@ import java.util.List;
  * in two-pane mode (on tablets) or a {@link ItemDetailActivity}
  * on handsets.
  */
-public class ItemDetailFragment extends Fragment implements Battery.Callback, Bluetooth.Callback {
-    /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
-     */
+public class ElementFragment extends Fragment implements Battery.Callback, Bluetooth.Callback {
+
     public static final String ARG_ITEM_ID = "item_id";
+
     private static final int INDICATOR_DURATION = 200;
 
-    private static final int PROCESSORS  = 0;
-    private static final int RAM 		 = 1;
-    private static final int STORAGE 	 = 2;
-    private static final int DISPLAY 	 = 3;
-    private static final int CAMERAS 	 = 4;
-    private static final int BATTERY 	 = 5;
-    private static final int SENSORS 	 = 6;
-    private static final int AUDIO 		 = 7;
-    private static final int GRAPHICS 	 = 8;
-    private static final int LOCATION 	 = 9;
-    private static final int NETWORK     = 10;
-    private static final int CELLULAR 	 = 11;
-    private static final int WIFI 		 = 12;
-    private static final int BLUETOOTH 	 = 13;
-    private static final int UPTIME 	 = 14;
-    private static final int PLATFORM 	 = 15;
-    private static final int IDENTIFIERS = 16;
-    private static final int FEATURES    = 17;
-    private static final int PROPERTIES  = 18;
-    private static final int KEYS 		 = 19;
-
-    /**
-     * The dummy content this fragment is presenting.
-     */
     private int mItem;
 
     private Element mElement;
@@ -79,7 +54,7 @@ public class ItemDetailFragment extends Fragment implements Battery.Callback, Bl
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ItemDetailFragment() {
+    public ElementFragment() {
     }
 
     @Override
@@ -100,7 +75,7 @@ public class ItemDetailFragment extends Fragment implements Battery.Callback, Bl
         View root = inflater.inflate(R.layout.fragment_item_detail, container, false);
 
         mListView = (ExpandableListView) root.findViewById(R.id.list);
-       // mListView.setGroupIndicator(null);
+        mListView.setGroupIndicator(null);
 
         List<Item> info = null;
 
@@ -110,29 +85,30 @@ public class ItemDetailFragment extends Fragment implements Battery.Callback, Bl
             // to load content from a content provider.
             mItem = getArguments().getInt(ARG_ITEM_ID);
 
-            String[] items = getResources().getStringArray(R.array.main_items);
-            getActivity().setTitle(items[mItem]);
+//            String[] items = getResources().getStringArray(R.array.main_items);
+//            getActivity().setTitle(items[mItem]);
 
             switch (mItem) {
-                case PROCESSORS: break;
-                case RAM: break;
-                case STORAGE: break;
-                case DISPLAY: break;
-                case CAMERAS: break;
-                case BATTERY: mElement = new Battery(getActivity());
+                case Elements.OVERVIEW: break;
+                case Elements.PROCESSORS: break;
+                case Elements.RAM: break;
+                case Elements.STORAGE: break;
+                case Elements.DISPLAY: break;
+                case Elements.CAMERAS: break;
+                case Elements.BATTERY: mElement = new Battery(getActivity());
                     mPlayImmediately = true;
                     break;
-                case SENSORS: break;
-                case AUDIO:
+                case Elements.SENSORS: break;
+                case Elements.AUDIO:
                     mElement = new Audio(getActivity());
                     info = ((Audio) mElement).getGroupedContents2();
                     break;
-                case GRAPHICS: break;
-                case LOCATION: break;
-                case NETWORK: break;
-                case CELLULAR: break;
-                case WIFI: break;
-                case BLUETOOTH:
+                case Elements.GRAPHICS: break;
+                case Elements.LOCATION: break;
+                case Elements.NETWORK: break;
+                case Elements.CELLULAR: break;
+                case Elements.WIFI: break;
+                case Elements.BLUETOOTH:
                     try {
                         mElement = new Bluetooth(getActivity());
                         mPlayImmediately = true;
@@ -140,12 +116,12 @@ public class ItemDetailFragment extends Fragment implements Battery.Callback, Bl
                         e.printStackTrace();
                     }
                     break;
-                case UPTIME: break;
-                case PLATFORM: break;
-                case IDENTIFIERS: break;
-                case FEATURES: break;
-                case PROPERTIES: break;
-                case KEYS: break;
+                case Elements.UPTIME: break;
+                case Elements.PLATFORM: break;
+                case Elements.IDENTIFIERS: break;
+                case Elements.FEATURES: break;
+                case Elements.PROPERTIES: break;
+                case Elements.KEYS: break;
             }
 
             if (mElement != null) {

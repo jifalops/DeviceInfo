@@ -9,7 +9,6 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.deviceinfoapp.R;
-import com.deviceinfoapp.model.Header;
 import com.deviceinfoapp.model.Item;
 import com.deviceinfoapp.model.ListItem2;
 import com.deviceinfoapp.util.GroupedListItems;
@@ -358,17 +357,14 @@ public class Audio extends Element {
 
     public List<Item> getGroupedContents2() {
         List<Item> items = new ArrayList<Item>();
-//        items.add(new Header(""));
         items.add(new ListItem2("Mode", getMode()));
         items.add(new ListItem2("Ringer Mode", getRingerMode()));
-        items.add(new Header("B"));
         items.add(new ListItem2("System Volume", getSystemVolume() + "/" + getSystemVolumeMax()));
         items.add(new ListItem2("Ring Volume", getRingVolume() + "/" + getRingVolumeMax()));
         items.add(new ListItem2("Call Volume", getCallVolume() + "/" + getCallVolumeMax()));
         items.add(new ListItem2("Music Volume", getMusicVolume() + "/" + getMusicVolumeMax()));
         items.add(new ListItem2("Alarm Volume", getAlarmVolume() + "/" + getAlarmVolumeMax()));
         items.add(new ListItem2("DTMF Volume", getDtmfVolume() + "/" + getDtmfVolumeMax()));
-//        items.add(new Header("C"));
         items.add(new ListItem2("Notification Volume", getNotificationVolume() + "/" + getNotificationVolumeMax()));
         items.add(new ListItem2("Ringer Vibrate", getRingerVibrateSetting()));
         items.add(new ListItem2("Notification Vibrate", getNotificationVibrateSetting()));
@@ -376,7 +372,6 @@ public class Audio extends Element {
         items.add(new ListItem2("Bluetooth SCO On", String.valueOf(isBluetoothScoOn())));
         items.add(new ListItem2("Bluetooth SCO Available Off Call", String.valueOf(isBluetoothScoAvailableOffCall())));
         items.add(new ListItem2("Microphone Muted", String.valueOf(isMicrophoneMute())));
-//        items.add(new Header("D"));
         items.add(new ListItem2("Music Active", String.valueOf(isMusicActive())));
         items.add(new ListItem2("Speakerphone On", String.valueOf(isSpeakerphoneOn())));
         items.add(new ListItem2("Wired Headset Connected", String.valueOf(isWiredHeadsetConnected())));

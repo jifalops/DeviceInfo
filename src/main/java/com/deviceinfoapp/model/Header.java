@@ -7,7 +7,7 @@ import com.deviceinfoapp.R;
  */
 public class Header extends AbsItem1 {
     public Header(CharSequence text) {
-        super(text, R.layout.header_item);
+        super(text, R.layout.expandable_header);
     }
 
     @Override

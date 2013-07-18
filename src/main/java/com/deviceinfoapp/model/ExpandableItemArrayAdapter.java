@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 
 import com.deviceinfoapp.R;
 
@@ -64,7 +65,12 @@ public class ExpandableItemArrayAdapter extends BaseExpandableListAdapter {
         if (groupPosition == 0) {
             return mInflater.inflate(R.layout.empty_view, null);
         } else {
-            return ((Item) getGroup(groupPosition)).getView(mInflater, convertView);
+            View v = ((Item) getGroup(groupPosition)).getView(mInflater, convertView);
+            int res = isExpanded
+                    ? R.drawable.collapse
+                    : R.drawable.expand;
+            ((ImageView) v.findViewById(R.id.expandCollapse)).setImageResource(res);
+            return v;
         }
     }
 

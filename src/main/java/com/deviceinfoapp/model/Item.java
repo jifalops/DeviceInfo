@@ -13,9 +13,11 @@ public interface Item {
     int TYPE_SUBHEADER = 3;
     int TYPE_SUBLIST_1 = 4;
     int TYPE_SUBLIST_2 = 5;
+    int TYPE_DRAWER_HEADER = 6;
+    int TYPE_DRAWER_ITEM = 7;
 
     // A count of the above items
-    int VIEW_TYPE_COUNT = 6;
+    int VIEW_TYPE_COUNT = 8;
 
     int getViewType();
     View getView(LayoutInflater inflater, View convertView);

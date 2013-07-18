@@ -12,7 +12,7 @@ import android.view.MenuItem;
  * in a {@link ItemListActivity}.
  * <p>
  * This activity is mostly just a 'shell' activity containing nothing
- * more than a {@link ItemDetailFragment}.
+ * more than a {@link ElementFragment}.
  */
 public class ItemDetailActivity extends BaseActivity {
 
@@ -33,18 +33,18 @@ public class ItemDetailActivity extends BaseActivity {
         //
         // http://developer.android.com/guide/components/fragments.html
         //
-        if (savedInstanceState == null) {
-            // Create the detail fragment and add it to the activity
-            // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putInt(ItemDetailFragment.ARG_ITEM_ID,
-                    getIntent().getIntExtra(ItemDetailFragment.ARG_ITEM_ID, -1));
-            ItemDetailFragment fragment = new ItemDetailFragment();
-            fragment.setArguments(arguments);
-            getFragmentManager().beginTransaction()
-                    .add(R.id.item_detail_container, fragment)
-                    .commit();
-        }
+//        if (savedInstanceState == null) {
+//            // Create the detail fragment and add it to the activity
+//            // using a fragment transaction.
+//            Bundle arguments = new Bundle();
+//            arguments.putInt(ElementFragment.ARG_ITEM_ID,
+//                    getIntent().getIntExtra(ElementFragment.ARG_ITEM_ID, -1));
+//            ElementFragment fragment = new ElementFragment();
+//            fragment.setArguments(arguments);
+//            getFragmentManager().beginTransaction()
+//                    .add(R.id.item_detail_container, fragment)
+//                    .commit();
+//        }
     }
 
     @Override

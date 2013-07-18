@@ -1,6 +1,5 @@
 package com.deviceinfoapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 
@@ -14,7 +13,7 @@ import android.os.Bundle;
  * <p>
  * The activity makes heavy use of fragments. The list of items is a
  * {@link ItemListFragment} and the item details
- * (if present) is a {@link ItemDetailFragment}.
+ * (if present) is a {@link ElementFragment}.
  * <p>
  * This activity also implements the required
  * {@link ItemListFragment.Callbacks} interface
@@ -57,24 +56,24 @@ public class ItemListActivity extends BaseActivity
      */
     @Override
     public void onItemSelected(int id) {
-        if (mTwoPane) {
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putInt(ItemDetailFragment.ARG_ITEM_ID, id);
-            ItemDetailFragment fragment = new ItemDetailFragment();
-            fragment.setArguments(arguments);
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.item_detail_container, fragment)
-                    .commit();
-
-        } else {
-            // In single-pane mode, simply start the detail activity
-            // for the selected item ID.
-            Intent detailIntent = new Intent(this, ItemDetailActivity.class);
-            detailIntent.putExtra(ItemDetailFragment.ARG_ITEM_ID, id);
-            startActivity(detailIntent);
-        }
+//        if (mTwoPane) {
+//            // In two-pane mode, show the detail view in this activity by
+//            // adding or replacing the detail fragment using a
+//            // fragment transaction.
+//            Bundle arguments = new Bundle();
+//            arguments.putInt(ElementFragment.ARG_ITEM_ID, id);
+//            ElementFragment fragment = new ElementFragment();
+//            fragment.setArguments(arguments);
+//            getFragmentManager().beginTransaction()
+//                    .replace(R.id.item_detail_container, fragment)
+//                    .commit();
+//
+//        } else {
+//            // In single-pane mode, simply start the detail activity
+//            // for the selected item ID.
+//            Intent detailIntent = new Intent(this, ItemDetailActivity.class);
+//            detailIntent.putExtra(ElementFragment.ARG_ITEM_ID, id);
+//            startActivity(detailIntent);
+//        }
     }
 }

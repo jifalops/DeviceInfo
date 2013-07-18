@@ -43,4 +43,7 @@
     <string name="menu_indicator">Change Indicator</string>
 
     <string name="about">About</string>
+
+    <string name="drawer_open">Drawer Open</string>
+    <string name="drawer_close">Drawer Close</string>
 </resources>
