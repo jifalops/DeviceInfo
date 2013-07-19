@@ -13,7 +13,7 @@ import android.util.Log;
 
 import com.deviceinfoapp.R;
 
-public class Camera extends Element {
+public class Camera extends AbsElement {
 	private static final String LOG_TAG = Camera.class.getSimpleName();
 	private static final int API = Build.VERSION.SDK_INT;
 	

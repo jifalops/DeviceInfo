@@ -1,8 +1,6 @@
 package com.deviceinfoapp;
 
 import android.bluetooth.BluetoothProfile;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -15,24 +13,11 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
 import com.deviceinfoapp.data.Elements;
-import com.deviceinfoapp.element.Audio;
-import com.deviceinfoapp.element.Battery;
-import com.deviceinfoapp.element.Bluetooth;
-import com.deviceinfoapp.element.Element;
-import com.deviceinfoapp.element.ListeningElement;
+import com.deviceinfoapp.element.ActiveElement;
 import com.deviceinfoapp.element.UnavailableFeatureException;
-import com.deviceinfoapp.model.ExpandableItemArrayAdapter;
-import com.deviceinfoapp.model.Item;
+import com.deviceinfoapp.viewable.ItemExpandableListAdapter;
 
-import java.util.List;
-
-/**
- * A fragment representing a single Item detail screen.
- * This fragment is either contained in a {@link ItemListActivity}
- * in two-pane mode (on tablets) or a {@link ItemDetailActivity}
- * on handsets.
- */
-public class ElementFragment extends Fragment implements Battery.Callback, Bluetooth.Callback {
+public class MainFragment extends Fragment implements ActiveElementController.Callbacks {
 
     public static final String ARG_ITEM_ID = "item_id";
 
@@ -40,21 +25,21 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
 
     private int mItem;
 
-    private Element mElement;
-    private boolean mIsPlayable, mIsPlaying;
+    private AbsElementController mController;
+    private boolean mIsActive, mIsPlaying;
     private MenuItem mIndicatorMenuItem, mPlayPauseMenuItem;
     private Handler mHandler;
     private boolean mIsShowing;
     private boolean mPlayImmediately;
 
-    private ExpandableItemArrayAdapter mAdapter;
+    private ItemExpandableListAdapter mAdapter;
     protected ExpandableListView mListView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ElementFragment() {
+    public MainFragment() {
     }
 
     @Override
@@ -77,7 +62,7 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
         mListView = (ExpandableListView) root.findViewById(R.id.list);
         mListView.setGroupIndicator(null);
 
-        List<Item> info = null;
+//        List<Item> info = null;
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
@@ -95,13 +80,15 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
                 case Elements.STORAGE: break;
                 case Elements.DISPLAY: break;
                 case Elements.CAMERAS: break;
-                case Elements.BATTERY: mElement = new Battery(getActivity());
+                case Elements.BATTERY:
+                    mController = new BatteryController(getActivity(), new BatteryController.Callbacks() {
+
+                    });
                     mPlayImmediately = true;
                     break;
                 case Elements.SENSORS: break;
                 case Elements.AUDIO:
-                    mElement = new Audio(getActivity());
-                    info = ((Audio) mElement).getGroupedContents2();
+                    mController = new AudioController(getActivity());
                     break;
                 case Elements.GRAPHICS: break;
                 case Elements.LOCATION: break;
@@ -110,7 +97,9 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
                 case Elements.WIFI: break;
                 case Elements.BLUETOOTH:
                     try {
-                        mElement = new Bluetooth(getActivity());
+                        mController = new BluetoothController(getActivity(), new BluetoothController.Callbacks() {
+
+                        });
                         mPlayImmediately = true;
                     } catch (UnavailableFeatureException e) {
                         e.printStackTrace();
@@ -124,22 +113,15 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
                 case Elements.KEYS: break;
             }
 
-            if (mElement != null) {
-                if (mElement instanceof ListeningElement) {
-                    mIsPlayable = true;
-                    ((ListeningElement) mElement).setCallback(this);
-                }
+            if (mController != null) {
+                if (mController instanceof ActiveElementController) {
+                    mIsActive = true;
+                    ((ActiveElement) mController).setCallbacks(this);
 
-
-
-                if (info != null) {
-                    mAdapter = new ExpandableItemArrayAdapter(getActivity(), info);
+                    mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
                     mListView.setAdapter(mAdapter);
                     mListView.expandGroup(0);
                 }
-
-
-
             }
         }
 
@@ -154,11 +136,11 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (mIsPlayable) {
+        if (mIsActive) {
             inflater.inflate(R.menu.fragment_detail_dynamic, menu);
             mIndicatorMenuItem = menu.findItem(R.id.menu_indicator);
             mPlayPauseMenuItem = menu.findItem(R.id.menu_playpause);
-            if (mPlayImmediately) play();
+            if (mPlayImmediately) start();
         }
         else {
             inflater.inflate(R.menu.fragment_detail, menu);
@@ -170,10 +152,10 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
         switch (item.getItemId()) {
             case R.id.menu_playpause:
                 if (mIsPlaying) {
-                    pause();
+                    stop();
                 }
                 else {
-                    play();
+                    start();
                 }
 //                final ImageView iv = new ImageView(getActivity());
 //                iv.setImageDrawable(item.getIcon());
@@ -205,21 +187,21 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
     @Override
     public void onStop() {
         super.onStop();
-        if (mIsPlayable) {
-            pause();
+        if (mIsActive) {
+            stop();
             mHandler.removeCallbacksAndMessages(null);
             mIndicatorMenuItem.setIcon(R.drawable.indicator_inactive);
         }
     }
 
-    private void play() {
-        ((ListeningElement) mElement).startListening();
+    private void start() {
+        ((ActiveElementController) mController).start();
         mPlayPauseMenuItem.setIcon(R.drawable.pause);
         mIsPlaying = true;
     }
 
-    private void pause() {
-        ((ListeningElement) mElement).stopListening();
+    private void stop() {
+        ((ActiveElementController) mController).stop();
         mPlayPauseMenuItem.setIcon(R.drawable.play);
         mIsPlaying = false;
     }
@@ -241,19 +223,38 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
         }, INDICATOR_DURATION);
     }
 
+
     //
-    // Battery callbacks
+    // ActiveItemController callbacks
     //
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        //((ModelAdapter) getAdapter()).update();
-        mAdapter.notifyDataSetChanged();
-        showIndicator();
+    public void onStarted() {
+
+    }
+
+    @Override
+    public void onStopped() {
+
+    }
+
+    @Override
+    public void onAction(int[] items, long timestamp) {
+
+    }
+
+
+    //
+    // BatteryController callbacks
+    //
+
+    @Override
+    public void onReceive() {
+
     }
 
     //
-    // Bluetooth callbacks
+    // BluetoothController callbacks
     //
 
     @Override
@@ -269,4 +270,7 @@ public class ElementFragment extends Fragment implements Battery.Callback, Bluet
         mAdapter.notifyDataSetChanged();
         showIndicator();
     }
+
+
+
 }

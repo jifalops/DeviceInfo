@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 // TODO add microphone
-public class Sensors extends ListeningElement {
+public class Sensors extends ActiveElement {
 	private static final String LOG_TAG = Sensors.class.getSimpleName();
 	private static final int API = Build.VERSION.SDK_INT;
 	
@@ -28,7 +28,7 @@ public class Sensors extends ListeningElement {
 	public static final int FREQUENCY_MEDIUM = 200;
 	public static final int FREQUENCY_LOW = 500;
 	
-	public interface Callback extends ListeningElement.Callback {
+	public interface Callback extends Callbacks {
 		/** Corresponds to SensorEventListener.onAccuracyChanged() */
 		void onAccuracyChanged(SensorWrapper sensorWrapper);
 		/** Corresponds to SensorEventListener.onSensorChanged() */
@@ -958,7 +958,7 @@ public class Sensors extends ListeningElement {
 	
 	@Override
 	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.startListening(onlyIfCallbackSet)) return false;
+		if (!super.start(onlyIfCallbackSet)) return false;
 		for (SensorWrapper sw : mSensors) {
 			if (onlyIfCallbackSet && sw.getCallback() == null) {
 				continue;
@@ -969,8 +969,8 @@ public class Sensors extends ListeningElement {
 	}
 	
 	@Override
-	public boolean stopListening() {
-		if (!super.stopListening()) return false;
+	public boolean stop() {
+		if (!super.stop()) return false;
 		for (SensorWrapper sw : mSensors) {
 			sw.stopListening();
 		}
@@ -978,10 +978,10 @@ public class Sensors extends ListeningElement {
 	}
 	
 	@Override
-	public void setCallback(ListeningElement.Callback callback) {
-		super.setCallback(callback);
+	public void setCallbacks(Callbacks callbacks) {
+		super.setCallbacks(callbacks);
 		for (SensorWrapper sw : mSensors) {
-			sw.setCallback((Callback) callback);
+			sw.setCallback((Callback) callbacks);
 		}
 	}
 	

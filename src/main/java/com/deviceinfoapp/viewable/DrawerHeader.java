@@ -1,4 +1,4 @@
-package com.deviceinfoapp.model;
+package com.deviceinfoapp.viewable;
 
 import com.deviceinfoapp.R;
 
@@ -7,7 +7,10 @@ import com.deviceinfoapp.R;
  */
 public class DrawerHeader extends AbsItem1 {
     public DrawerHeader(CharSequence text) {
-        super(text, R.layout.drawer_header);
+        this(text, null);
+    }
+        public DrawerHeader(CharSequence text, int[] actions) {
+        super(text, R.layout.drawer_header, actions);
     }
 
     @Override

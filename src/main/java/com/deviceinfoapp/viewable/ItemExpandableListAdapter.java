@@ -1,4 +1,4 @@
-package com.deviceinfoapp.model;
+package com.deviceinfoapp.viewable;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -15,12 +15,12 @@ import java.util.List;
 /**
  * Created by Jake on 7/17/13.
  */
-public class ExpandableItemArrayAdapter extends BaseExpandableListAdapter {
+public class ItemExpandableListAdapter extends BaseExpandableListAdapter {
 
     private LayoutInflater mInflater;
     private GroupedItems mGroupedItems;
 
-    public ExpandableItemArrayAdapter(Context context, List<Item> items) {
+    public ItemExpandableListAdapter(Context context, List<Item> items) {
         mInflater = LayoutInflater.from(context);
         mGroupedItems = new GroupedItems(items);
     }

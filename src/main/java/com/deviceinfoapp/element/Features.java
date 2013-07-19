@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class Features extends Element {
+public class Features extends AbsElement {
 	private static final int API = Build.VERSION.SDK_INT;
 	
 	private final PackageManager mPackageManager;

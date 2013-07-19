@@ -17,12 +17,12 @@ import javax.microedition.khronos.opengles.GL10;
 // even if still using GLES20 methods.
 
 // TODO more values & limits
-public class Graphics extends ListeningElement implements GLSurfaceView.Renderer {
+public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 	public static final float OPENGLES_VERSION_10 = 1.0f;
 	public static final float OPENGLES_VERSION_11 = 1.1f;
 	public static final float OPENGLES_VERSION_20 = 2.0f;
 
-	public interface Callback extends ListeningElement.Callback {
+	public interface Callback extends Callbacks {
 		/** Corresponds to GLSurfaceView.Renderer.onSurfaceCreated(); */
 		void onSurfaceCreated(GL10 gl, EGLConfig config);
 		/** Corresponds to GLSurfaceView.Renderer.onSurfaceChanged(); */
@@ -236,19 +236,19 @@ public class Graphics extends ListeningElement implements GLSurfaceView.Renderer
 			else if (mOpenGlesVersion == OPENGLES_VERSION_11) mOpenGles = new OpenGles11();
 			else if (mOpenGlesVersion == OPENGLES_VERSION_20) mOpenGles = new OpenGles20();
 		}
-		if ((Callback) getCallback() != null) ((Callback) getCallback()).onSurfaceCreated(gl, config);
+		if ((Callback) getCallbacks() != null) ((Callback) getCallbacks()).onSurfaceCreated(gl, config);
 	}
 	
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 
-		if ((Callback) getCallback() != null) ((Callback) getCallback()).onSurfaceChanged(gl, width, height);
+		if ((Callback) getCallbacks() != null) ((Callback) getCallbacks()).onSurfaceChanged(gl, width, height);
 	}
 	
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		
-		if ((Callback) getCallback() != null) ((Callback) getCallback()).onDrawFrame(gl);
+		if ((Callback) getCallbacks() != null) ((Callback) getCallbacks()).onDrawFrame(gl);
 	}
 
 	
@@ -262,14 +262,14 @@ public class Graphics extends ListeningElement implements GLSurfaceView.Renderer
 	
 	@Override
 	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.startListening(onlyIfCallbackSet)) return false;
+		if (!super.start(onlyIfCallbackSet)) return false;
 		onResume();
 		return setListening(true);
 	}
 	
 	@Override
-	public boolean stopListening() {
-		if (!super.stopListening()) return false;
+	public boolean stop() {
+		if (!super.stop()) return false;
 		onPause();
 		return !setListening(false);
 	}

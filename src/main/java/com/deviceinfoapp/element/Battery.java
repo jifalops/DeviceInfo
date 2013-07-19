@@ -6,15 +6,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.Build;
-import android.widget.ImageView;
 
 import com.deviceinfoapp.R;
 
-import java.util.LinkedHashMap;
+public class Battery extends ActiveElement {
 
-public class Battery extends ListeningElement {
-	
-	public interface Callback extends ListeningElement.Callback {
+    private static final int ACTIVE_ACTIONS = 1;
+    public static final int ACTION_BATTERY = 0;
+
+	public interface Callbacks extends ActiveElement.Callbacks {
 		void onReceive(Context context, Intent intent);
 	}
 	
@@ -34,10 +34,9 @@ public class Battery extends ListeningElement {
 	public final String STATUS_NOT_CHARGING;
 	public final String STATUS_UNKNOWN;
 		
-	private final BatteryChangedBroadcastReceiver mBatteryReceiver;
-	private final IntentFilter mIntentFilter;
-	
-	private long mTimestamp;	
+	private BatteryChangedBroadcastReceiver mBatteryReceiver;
+	private IntentFilter mIntentFilter;
+
 	private int mLevel;
 	private int mMaxLevel;
 	private int mVoltage; 	// mV
@@ -49,11 +48,8 @@ public class Battery extends ListeningElement {
 	private int mIconResourceId;
 	private boolean mPresent; // battery exists
 	
-	private ImageView mIconImageView;
-	
-	
-	public Battery(Context context) {
-		super(context);
+	public Battery(Context context, Battery.Callbacks callbacks) {
+		super(context, callbacks);
 		HEALTH_COLD = context.getString(R.string.battery_health_cold);
 		HEALTH_DEAD = context.getString(R.string.battery_health_dead);
 		HEALTH_GOOD = context.getString(R.string.battery_health_good);
@@ -71,6 +67,9 @@ public class Battery extends ListeningElement {
 		
 		mBatteryReceiver = new BatteryChangedBroadcastReceiver();
 		mIntentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+
+        setActiveActionCount(ACTIVE_ACTIONS);
+
 	}
 	
 	public String getHealth(int health) {
@@ -94,7 +93,7 @@ public class Battery extends ListeningElement {
 		}
 	}
 	
-	public String getStatus(int status) {
+	public String getChargingStatus(int status) {
 		switch (status) {
 		case BatteryManager.BATTERY_STATUS_CHARGING: return STATUS_CHARGING;
 		case BatteryManager.BATTERY_STATUS_DISCHARGING: return STATUS_DISCHARGING;
@@ -105,31 +104,18 @@ public class Battery extends ListeningElement {
 		}		
 	}
 	
-	public String getStatusString() {
-		return getStatus(mStatus);
+	public String getChargingStatus() {
+		return getChargingStatus(mStatus);
 	}
 	
-	public String getHealthString() {
+	public String getHealth() {
 		return getHealth(mHealth);
 	}
 	
-	public String getPluggedInStatusString() {
+	public String getPluggedInStatus() {
 		return getPluggedInStatus(mPluggedStatus);
 	}
-	
-	@Override
-	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.startListening(onlyIfCallbackSet)) return false;
-		getContext().registerReceiver(mBatteryReceiver, mIntentFilter);
-		return setListening(true);		
-	}
-	
-	@Override
-	public boolean stopListening() {
-		if (!super.stopListening()) return false;
-		getContext().unregisterReceiver(mBatteryReceiver);
-		return !setListening(false);
-	}
+
 
 	public BroadcastReceiver getReceiver() {
 		return mBatteryReceiver;
@@ -137,10 +123,6 @@ public class Battery extends ListeningElement {
 	
 	public IntentFilter getIntentFilter() {
 		return mIntentFilter;
-	}
-
-	public long getTimestamp() {
-		return mTimestamp;
 	}
 	
 	public int getLevel() {
@@ -165,15 +147,15 @@ public class Battery extends ListeningElement {
 		return mTechnology;
 	}
 	
-	public int getStatus() {
+	public int getChargingStatusInt() {
 		return mStatus;
 	}
 	
-	public int getHealth() {
+	public int getHealthInt() {
 		return mHealth;
 	}
 	
-	public int getPluggedInStatus() {
+	public int getPluggedInStatusInt() {
 		return mPluggedStatus;
 	}
 	
@@ -184,33 +166,25 @@ public class Battery extends ListeningElement {
 	public boolean isBatteryPresent() {
 		return mPresent;
 	}
-	
-	public ImageView getIconImageView() {
-		return mIconImageView;
-	}
-	
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = super.getContents();
 
-        contents.put("Level", getLevel() + "/" + getLevelMax());
-        contents.put("Temperature (C)", String.valueOf(getTemperature()));
-        contents.put("Status", getStatusString());
-        contents.put("Plugged In Status", getPluggedInStatusString());
-        contents.put("Voltage (mV)", String.valueOf(getVoltage()));
-        contents.put("Technology", getTechnology());
-        contents.put("Health", getHealthString());
-        contents.put("Battery Is Present", String.valueOf(isBatteryPresent()));
-//		contents.put("Icon Resource ID", String.valueOf(getIconResourceId()));
-		
-		return contents;
-	}
+    @Override
+    public void start() {
+        if (isActive()) return;
+        getContext().registerReceiver(mBatteryReceiver, mIntentFilter);
+        super.start();
+    }
+
+    @Override
+    public void stop() {
+        if (!isActive()) return;
+        getContext().unregisterReceiver(mBatteryReceiver);
+        super.stop();
+    }
 
 	private class BatteryChangedBroadcastReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (!intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)) return;	
-			mTimestamp = System.currentTimeMillis();
+            if (!isActionAllowed(ACTION_BATTERY)) return;
 			mLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
 			mMaxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 0);
 			mVoltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0);
@@ -221,11 +195,9 @@ public class Battery extends ListeningElement {
 			mPluggedStatus = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
 			mIconResourceId = intent.getIntExtra(BatteryManager.EXTRA_ICON_SMALL, 0);
 			mPresent = intent.getBooleanExtra(BatteryManager.EXTRA_PRESENT, true);
-			
-			mIconImageView = new ImageView(context);
-			mIconImageView.setImageResource(mIconResourceId);
-			
-			if (getCallback() != null) ((Callback) getCallback()).onReceive(context, intent);
+
+            setActionTime(ACTION_BATTERY);
+            ((Callbacks) mCallbacks).onReceive(context, intent);
 		}
 	}
 }

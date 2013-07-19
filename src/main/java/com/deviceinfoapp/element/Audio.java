@@ -5,20 +5,14 @@ import android.media.AudioManager;
 import android.media.MediaRecorder.AudioEncoder;
 import android.media.MediaRecorder.AudioSource;
 import android.media.MediaRecorder.OutputFormat;
-import android.os.Build;
-import android.text.TextUtils;
 
 import com.deviceinfoapp.R;
-import com.deviceinfoapp.model.Item;
-import com.deviceinfoapp.model.ListItem2;
-import com.deviceinfoapp.util.GroupedListItems;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
-public class Audio extends Element {	
-	private static final int API = Build.VERSION.SDK_INT;
+public class Audio extends AbsElement {
+
 	//TODO live audio
 	// AudioManager constants
 	public final String MODE_CURRENT;
@@ -297,86 +291,4 @@ public class Audio extends Element {
 	
 	//TODO Channel mono/stereo/quad/surround
 	// encoding 8bit/16bit
-	
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-
-        contents.put("Mode", getMode());
-        contents.put("Ringer Mode", getRingerMode());
-        contents.put("System Volume", getSystemVolume() + "/" + getSystemVolumeMax());
-        contents.put("Ring Volume", getRingVolume() + "/" + getRingVolumeMax());
-        contents.put("Call Volume", getCallVolume() + "/" + getCallVolumeMax());
-        contents.put("Music Volume", getMusicVolume() + "/" + getMusicVolumeMax());
-        contents.put("Alarm Volume", getAlarmVolume() + "/" + getAlarmVolumeMax());
-        contents.put("DTMF Volume", getDtmfVolume() + "/" + getDtmfVolumeMax());
-        contents.put("Notification Volume", getNotificationVolume() + "/" + getNotificationVolumeMax());
-        contents.put("Ringer Vibrate", getRingerVibrateSetting());
-        contents.put("Notification Vibrate", getNotificationVibrateSetting());
-        contents.put("Bluetooth A2DP On", String.valueOf(isBluetoothA2dpOn()));
-        contents.put("Bluetooth SCO On", String.valueOf(isBluetoothScoOn()));
-        contents.put("Bluetooth SCO Available Off Call", String.valueOf(isBluetoothScoAvailableOffCall()));
-        contents.put("Microphone Muted", String.valueOf(isMicrophoneMute()));
-        contents.put("Music Active", String.valueOf(isMusicActive()));
-        contents.put("Speakerphone On", String.valueOf(isSpeakerphoneOn()));
-        contents.put("Wired Headset Connected", String.valueOf(isWiredHeadsetConnected()));
-        contents.put("Supported Formats", TextUtils.join(", ", getSupportedFormats()));
-        contents.put("Supported Sources", TextUtils.join(", ", getSupportedSources()));
-
-		return contents;
-	}
-
-    public GroupedListItems getGroupedContents() {
-        GroupedListItems info = new GroupedListItems();
-        info.addGroup("A");
-        info.addItem("Mode", getMode());
-        info.addItem("Ringer Mode", getRingerMode());
-        info.addGroup("B");
-        info.addItem("System Volume", getSystemVolume() + "/" + getSystemVolumeMax());
-        info.addItem("Ring Volume", getRingVolume() + "/" + getRingVolumeMax());
-        info.addItem("Call Volume", getCallVolume() + "/" + getCallVolumeMax());
-        info.addItem("Music Volume", getMusicVolume() + "/" + getMusicVolumeMax());
-        info.addItem("Alarm Volume", getAlarmVolume() + "/" + getAlarmVolumeMax());
-        info.addItem("DTMF Volume", getDtmfVolume() + "/" + getDtmfVolumeMax());
-        info.addGroup("C");
-        info.addItem("Notification Volume", getNotificationVolume() + "/" + getNotificationVolumeMax());
-        info.addItem("Ringer Vibrate", getRingerVibrateSetting());
-        info.addItem("Notification Vibrate", getNotificationVibrateSetting());
-        info.addItem("Bluetooth A2DP On", String.valueOf(isBluetoothA2dpOn()));
-        info.addItem("Bluetooth SCO On", String.valueOf(isBluetoothScoOn()));
-        info.addItem("Bluetooth SCO Available Off Call", String.valueOf(isBluetoothScoAvailableOffCall()));
-        info.addItem("Microphone Muted", String.valueOf(isMicrophoneMute()));
-        info.addGroup("D");
-        info.addItem("Music Active", String.valueOf(isMusicActive()));
-        info.addItem("Speakerphone On", String.valueOf(isSpeakerphoneOn()));
-        info.addItem("Wired Headset Connected", String.valueOf(isWiredHeadsetConnected()));
-        info.addItem("Supported Formats", TextUtils.join(", ", getSupportedFormats()));
-        info.addItem("Supported Sources", TextUtils.join(", ", getSupportedSources()));
-        return info;
-    }
-
-    public List<Item> getGroupedContents2() {
-        List<Item> items = new ArrayList<Item>();
-        items.add(new ListItem2("Mode", getMode()));
-        items.add(new ListItem2("Ringer Mode", getRingerMode()));
-        items.add(new ListItem2("System Volume", getSystemVolume() + "/" + getSystemVolumeMax()));
-        items.add(new ListItem2("Ring Volume", getRingVolume() + "/" + getRingVolumeMax()));
-        items.add(new ListItem2("Call Volume", getCallVolume() + "/" + getCallVolumeMax()));
-        items.add(new ListItem2("Music Volume", getMusicVolume() + "/" + getMusicVolumeMax()));
-        items.add(new ListItem2("Alarm Volume", getAlarmVolume() + "/" + getAlarmVolumeMax()));
-        items.add(new ListItem2("DTMF Volume", getDtmfVolume() + "/" + getDtmfVolumeMax()));
-        items.add(new ListItem2("Notification Volume", getNotificationVolume() + "/" + getNotificationVolumeMax()));
-        items.add(new ListItem2("Ringer Vibrate", getRingerVibrateSetting()));
-        items.add(new ListItem2("Notification Vibrate", getNotificationVibrateSetting()));
-        items.add(new ListItem2("Bluetooth A2DP On", String.valueOf(isBluetoothA2dpOn())));
-        items.add(new ListItem2("Bluetooth SCO On", String.valueOf(isBluetoothScoOn())));
-        items.add(new ListItem2("Bluetooth SCO Available Off Call", String.valueOf(isBluetoothScoAvailableOffCall())));
-        items.add(new ListItem2("Microphone Muted", String.valueOf(isMicrophoneMute())));
-        items.add(new ListItem2("Music Active", String.valueOf(isMusicActive())));
-        items.add(new ListItem2("Speakerphone On", String.valueOf(isSpeakerphoneOn())));
-        items.add(new ListItem2("Wired Headset Connected", String.valueOf(isWiredHeadsetConnected())));
-        items.add(new ListItem2("Supported Formats", TextUtils.join(", ", getSupportedFormats())));
-        items.add(new ListItem2("Supported Sources", TextUtils.join(", ", getSupportedSources())));
-        return items;
-    }
 }

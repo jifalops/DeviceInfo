@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class Network extends Element {
+public class Network extends AbsElement {
 	private static final int API = Build.VERSION.SDK_INT;
 	
 	// ConnectivityManager strings

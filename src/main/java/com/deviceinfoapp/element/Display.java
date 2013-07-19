@@ -13,7 +13,7 @@ import com.deviceinfoapp.util.ShellHelper;
 
 import java.util.LinkedHashMap;
 
-public class Display extends Element {
+public class Display extends AbsElement {
 	private static final int API = Build.VERSION.SDK_INT;
 	
 	private android.view.Display mDisplay;

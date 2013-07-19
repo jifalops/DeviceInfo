@@ -1,4 +1,4 @@
-package com.deviceinfoapp.model;
+package com.deviceinfoapp.viewable;
 
 import android.content.Context;
 
@@ -7,8 +7,8 @@ import java.util.List;
 /**
  * Created by Jake on 7/18/13.
  */
-public class DrawerItemAdapter extends ItemArrayAdapter {
-    public DrawerItemAdapter(Context context, List<Item> items) {
+public class DrawerItemArrayAdapter extends ItemArrayAdapter {
+    public DrawerItemArrayAdapter(Context context, List<Item> items) {
         super(context, items);
     }
 

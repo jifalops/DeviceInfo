@@ -4,10 +4,12 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,13 +17,12 @@ import android.widget.ListView;
 
 import com.deviceinfoapp.data.Elements;
 import com.deviceinfoapp.data.NavData;
-import com.deviceinfoapp.model.DrawerItem;
-import com.deviceinfoapp.model.DrawerItemAdapter;
+import com.deviceinfoapp.viewable.DrawerItemArrayAdapter;
 
 /**
  * Created by Jake on 6/24/13.
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends FragmentActivity {
 
     private ElementPagerAdapter mPagerAdapter;
     ViewPager mViewPager;
@@ -55,7 +56,7 @@ public class MainActivity extends BaseActivity {
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new DrawerItemAdapter(this, NavData.DRAWER_ITEMS));
+        mDrawerList.setAdapter(new DrawerItemArrayAdapter(this, NavData.DRAWER_ITEMS));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
@@ -89,6 +90,12 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
         // ActionBarDrawerToggle will take care of this.
@@ -113,19 +120,21 @@ public class MainActivity extends BaseActivity {
 
     private void selectItem(int position) {
         // update the main content by replacing fragments
-//        ElementFragment fragment = new ElementFragment();
+//        MainFragment fragment = new MainFragment();
 //        Bundle args = new Bundle();
-//        args.putInt(ElementFragment.ARG_ITEM_ID, position);
+//        args.putInt(MainFragment.ARG_ITEM_ID, position);
 //        fragment.setArguments(args);
 //
 //        FragmentManager fragmentManager = getFragmentManager();
 //        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
-        mViewPager.setCurrentItem(NavData.ITEM_MAP[position], false);
+        int element = NavData.DRAWER_TO_ELEMENT[position];
+
+        mViewPager.setCurrentItem(element, false);
 
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
-        setTitle(((DrawerItem) NavData.DRAWER_ITEMS.get(position)).getText());
+        setTitle(Elements.NAMES[element]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
@@ -163,9 +172,9 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            ElementFragment fragment = new ElementFragment();
+            MainFragment fragment = new MainFragment();
             Bundle args = new Bundle();
-            args.putInt(ElementFragment.ARG_ITEM_ID, position);
+            args.putInt(MainFragment.ARG_ITEM_ID, position);
             fragment.setArguments(args);
             return fragment;
         }

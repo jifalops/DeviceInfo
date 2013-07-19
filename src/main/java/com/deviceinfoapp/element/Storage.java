@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 
-public class Storage extends Element {
+public class Storage extends AbsElement {
 	private static final String LOG_TAG = Storage.class.getSimpleName();
 	
 	private List<Mount> mMounts;

@@ -10,7 +10,7 @@ import com.deviceinfoapp.util.ShellHelper;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class Platform extends Element {
+public class Platform extends AbsElement {
 	private static final int API = Build.VERSION.SDK_INT;
 	public final String ECLAIR;
 	public final String FROYO;

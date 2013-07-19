@@ -1,4 +1,4 @@
-package com.deviceinfoapp.model;
+package com.deviceinfoapp.viewable;
 
 import android.content.Context;
 import android.view.LayoutInflater;

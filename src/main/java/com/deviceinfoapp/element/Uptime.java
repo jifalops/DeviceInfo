@@ -10,9 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 
-public class Uptime extends ListeningElement {
+public class Uptime extends ActiveElement {
 	
-	public interface Callback extends ListeningElement.Callback {
+	public interface Callback extends Callbacks {
 		void onUptimeUpdated(float uptimeTotal, float uptimeAsleep);
 	}
 	
@@ -56,7 +56,7 @@ public class Uptime extends ListeningElement {
 			else if (parts.length == 1) mUptimeTotal = Float.valueOf(parts[0]);
 		}
 		catch (NumberFormatException ignored) {}	
-		if (getCallback() != null) ((Callback) getCallback()).onUptimeUpdated(mUptimeTotal, mUptimeAsleep);
+		if (getCallbacks() != null) ((Callback) getCallbacks()).onUptimeUpdated(mUptimeTotal, mUptimeAsleep);
 	}
 	
 	@Override
@@ -71,14 +71,14 @@ public class Uptime extends ListeningElement {
 
 	@Override
 	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.startListening(onlyIfCallbackSet)) return false;				
+		if (!super.start(onlyIfCallbackSet)) return false;
 		mUpdateTask.start();		
 		return setListening(true);
 	}
 
 	@Override
-	public boolean stopListening() {
-		if (!super.stopListening()) return false;
+	public boolean stop() {
+		if (!super.stop()) return false;
 		mUpdateTask.stop();
 		return !setListening(false);
 	}
@@ -87,14 +87,14 @@ public class Uptime extends ListeningElement {
 //	@Override
 //	public boolean pause() {
 //		if (mIsPaused) return false;
-//		mIsPaused = stopListening();
+//		mIsPaused = stop();
 //		return mIsPaused;
 //	}
 //
 //	@Override
 //	public boolean resume() {
 //		if (!mIsPaused) return false;
-//		mIsPaused = !startListening();
+//		mIsPaused = !start();
 //		return !mIsPaused;
 //	}
 //
@@ -104,14 +104,14 @@ public class Uptime extends ListeningElement {
 //	}
 //
 //	@Override
-//	public Object getCallback() {
+//	public Object getCallbacks() {
 //		return mCallback;
 //	}
 //
 //	@Override
-//	public boolean setCallback(Object callback) {
-//		if (callback instanceof Callback) {
-//			mCallback = (Callback) callback;
+//	public boolean setCallbacks(Object callback) {
+//		if (callback instanceof Callbacks) {
+//			mCallback = (Callbacks) callback;
 //			return true;
 //		}
 //		return false;

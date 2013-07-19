@@ -1,4 +1,4 @@
-package com.deviceinfoapp.model;
+package com.deviceinfoapp.viewable;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,11 +8,11 @@ import android.view.View;
  */
 public interface Item {
     int TYPE_HEADER = 0;
-    int TYPE_LIST_1 = 1;
-    int TYPE_LIST_2 = 2;
+    int TYPE_ITEM_1 = 1;
+    int TYPE_ITEM_2 = 2;
     int TYPE_SUBHEADER = 3;
-    int TYPE_SUBLIST_1 = 4;
-    int TYPE_SUBLIST_2 = 5;
+    int TYPE_SUBITEM_1 = 4;
+    int TYPE_SUBITEM_2 = 5;
     int TYPE_DRAWER_HEADER = 6;
     int TYPE_DRAWER_ITEM = 7;
 
@@ -21,4 +21,7 @@ public interface Item {
 
     int getViewType();
     View getView(LayoutInflater inflater, View convertView);
+
+    int[] getActions();
+    boolean respondsTo(int action);
 }

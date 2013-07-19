@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 
-public class Identifiers extends Element {
+public class Identifiers extends AbsElement {
 
 	public final String ANDROID_ID;
 	public final String DEVICE_ID;

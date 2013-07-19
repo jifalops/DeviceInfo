@@ -25,7 +25,7 @@ import com.deviceinfoapp.R;
 // TODO use a separate thread for listeners and publishProgress when appropriate
 public class Location extends ThrottledListeningElement implements GpsStatus.Listener, GpsStatus.NmeaListener {
 	
-	public interface ProviderCallback extends ListeningElement.Callback {
+	public interface ProviderCallback extends Callbacks {
 		/** Corresponds to LocationListener.onLocationChanged() */
 		void onLocationChanged(ProviderWrapper providerWrapper);
 		/** Corresponds to LocationListener.onProviderDisabled() */
@@ -38,7 +38,7 @@ public class Location extends ThrottledListeningElement implements GpsStatus.Lis
 		void onAddressChanged(ProviderWrapper providerWrapper);		
 	}
 	
-	public interface GpsCallback extends ListeningElement.Callback {
+	public interface GpsCallback extends Callbacks {
 		/** Corresponds to GpsStatus.Listener.onGpsStatusChanged() */
 		void onGpsStatusChanged(Location location);
 		/** Corresponds to GpsStatus.NmeaListener.onNmeaReceived() */		
@@ -162,7 +162,7 @@ public class Location extends ThrottledListeningElement implements GpsStatus.Lis
 	
 	@Override
 	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.startListening(onlyIfCallbackSet)) return false;
+		if (!super.start(onlyIfCallbackSet)) return false;
 		mLocationManager.addGpsStatusListener(this);
 		mLocationManager.addNmeaListener(this);
 		for (ProviderWrapper pw : mProviders) {
@@ -172,8 +172,8 @@ public class Location extends ThrottledListeningElement implements GpsStatus.Lis
 	}
 	
 	@Override
-	public boolean stopListening() {
-		if (!super.stopListening()) return false;
+	public boolean stop() {
+		if (!super.stop()) return false;
 		mLocationManager.removeGpsStatusListener(this);
 		mLocationManager.removeNmeaListener(this);
 		for (ProviderWrapper pw : mProviders) {
@@ -183,7 +183,7 @@ public class Location extends ThrottledListeningElement implements GpsStatus.Lis
 	}
 	
 	public boolean isAnyListening() {
-		if (isListening()) return true;
+		if (isActive()) return true;
 		for (ProviderWrapper pw : mProviders) {
 			if (pw.isListening()) return true;
 		}
@@ -191,7 +191,7 @@ public class Location extends ThrottledListeningElement implements GpsStatus.Lis
 	}
 	
 	public boolean isAllListening() {
-		if (!isListening()) return false;
+		if (!isActive()) return false;
 		for (ProviderWrapper pw : mProviders) {
 			if (!pw.isListening()) return false;
 		}
@@ -253,7 +253,7 @@ public class Location extends ThrottledListeningElement implements GpsStatus.Lis
 		mLastGpsStatusTimestamp = time;
 		mLastGpsStatusEvent = event;
 		updateGpsStatus();
-		if (getCallback() != null) ((GpsCallback) getCallback()).onGpsStatusChanged(this);			
+		if (getCallbacks() != null) ((GpsCallback) getCallbacks()).onGpsStatusChanged(this);
 	}
 
 	@Override
@@ -263,7 +263,7 @@ public class Location extends ThrottledListeningElement implements GpsStatus.Lis
 		mLastNmeaTimestamp = time;
 		mLastNmea = nmea;
 		updateGpsStatus();
-		if (getCallback() != null) ((GpsCallback) getCallback()).onNmeaReceived(this);
+		if (getCallbacks() != null) ((GpsCallback) getCallbacks()).onNmeaReceived(this);
 	}
 	
 	
@@ -618,7 +618,7 @@ public class Location extends ThrottledListeningElement implements GpsStatus.Lis
 		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> subcontents;
 		
-		contents.put("Is Listening (GpsStatus)", String.valueOf(isListening()));
+		contents.put("Is Listening (GpsStatus)", String.valueOf(isActive()));
 		contents.put("Best Provider index", String.valueOf(mProviders.indexOf(getBestProvider())));
 		contents.put("Last GPS Status Timestamp", String.valueOf(getLastGpsStatusTimestamp()));
 		contents.put("Last GPS Status Event", getLastGpsStatusEventString());

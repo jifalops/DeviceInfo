@@ -8,20 +8,19 @@ import android.bluetooth.BluetoothHeadset;
 import android.bluetooth.BluetoothHealth;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.os.Build;
 
 import com.deviceinfoapp.R;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 
-public class Bluetooth extends ListeningElement {
-	private static final int API = Build.VERSION.SDK_INT;
-	
-	public interface Callback extends ListeningElement.Callback {
+public class Bluetooth extends ActiveElement {
+
+    private static final int ACTIVE_ACTIONS = 2;
+    public static final int ACTIVE_ACTION_CONNECTED = 0;
+    public static final int ACTIVE_ACTION_DISCONNECTED = 1;
+
+	public interface Callbacks extends ActiveElement.Callbacks {
 		void onServiceConnected(int profile, BluetoothProfile proxy);
 		void onServiceDisconnected(int profile);
 	}
@@ -130,15 +129,16 @@ public class Bluetooth extends ListeningElement {
 	public final String SERVICE_POSITIONING;
 	public final String SERVICE_RENDER;
 	public final String SERVICE_TELEPHONY;
-	
-	
-	private final BluetoothAdapter mBluetoothAdapter;
+
+
+	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothA2dp mA2dpProfile;
 	private BluetoothHeadset mHeadsetProfile;
 	private BluetoothHealth mHealthProfile;
 	
-	public Bluetooth(Context context) throws UnavailableFeatureException {
-		super(context);
+	public Bluetooth(Context context, Bluetooth.Callbacks callbacks) throws UnavailableFeatureException {
+		super(context, callbacks);
+        // TODO are there other adapters?
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) throw new UnavailableFeatureException();			
 		
@@ -246,7 +246,9 @@ public class Bluetooth extends ListeningElement {
 		SERVICE_POSITIONING = context.getString(R.string.bluetooth_service_positioning);
 		SERVICE_RENDER = context.getString(R.string.bluetooth_service_render);
 		SERVICE_TELEPHONY = context.getString(R.string.bluetooth_service_telephony);
-				
+
+
+        setActiveActionCount(ACTIVE_ACTIONS);
 	}
 		
 	public String getProfileType(int type) {
@@ -509,129 +511,30 @@ public class Bluetooth extends ListeningElement {
 		if (cls.hasService(BluetoothClass.Service.TELEPHONY)) list.add(SERVICE_TELEPHONY);
 		return list.toArray(new String[list.size()]);
 	}
-	
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
 
-		// BluetoothAdapter
-		String address = mBluetoothAdapter.getAddress();
-		boolean isValid = BluetoothAdapter.checkBluetoothAddress(address);
-		contents.put("MAC Address", address);
-		contents.put("MAC Is Valid", String.valueOf(isValid));
-		contents.put("Name", mBluetoothAdapter.getName());
-		contents.put("Scan Mode", getScanMode());
-		contents.put("Adapter State", getAdapterState());
-		contents.put("Is Discovering", String.valueOf(mBluetoothAdapter.isDiscovering()));
-		contents.put("Is Enabled", String.valueOf(mBluetoothAdapter.isEnabled()));
-		
-		if (API >= 14) {
-			contents.put("A2DP Profile Connection State", getProfileState(
-					mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.A2DP)));
-			contents.put("Headset Profile Connection State", getProfileState(
-					mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEADSET)));
-			contents.put("Health Profile Connection State", getProfileState(
-					mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEALTH)));
-		}
-		if (API >= 11 && mA2dpProfile == null) contents.put("Local A2DP Profile", null);
-		if (API >= 11 && mHeadsetProfile == null) contents.put("Local Headset Profile", null);
-		if (API >= 14 && mHealthProfile == null) contents.put("Local Health Profile", null);
-		
-		// BluetoothDevice
-		if (isValid) {
-			BluetoothDevice dev = mBluetoothAdapter.getRemoteDevice(address);
-			if (dev == null) contents.put("Adapter Device", null);
-			else {
-				LinkedHashMap<String, String> subcontents = getBluetoothDeviceContents(dev);
-				for (Entry<String, String> e : subcontents.entrySet()) {
-					contents.put("Adapter Device " + e.getKey(), e.getValue());
-				}
-			}
-		}
-		
-		Set<BluetoothDevice> devs = mBluetoothAdapter.getBondedDevices();
-		if (devs == null || devs.isEmpty()) contents.put("Bonded Devices", null);
-		else {		
-			LinkedHashMap<String, String> subcontents;
-			int i = 0;
-			for (BluetoothDevice d : devs) {
-				subcontents = getBluetoothDeviceContents(d);
-				for (Entry<String, String> e : subcontents.entrySet()) {
-					contents.put("Device " + i + " " + e.getKey(), e.getValue());
-				}
-				++i;
-			}
-		}
-		
-		return contents;
-	}
-	
-	private LinkedHashMap<String, String> getBluetoothDeviceContents(BluetoothDevice device) {
-		if (device == null) return null;
-		LinkedHashMap<String, String> contents = super.getContents();
-		
-		String address = device.getAddress();
-		contents.put("Address", address);
-		contents.put("Address Valid", String.valueOf(BluetoothAdapter.checkBluetoothAddress(address)));
-		contents.put("Bond State", getBondState(device.getBondState()));
-		contents.put("Name", device.getName());							
-		// BluetoothClass
-		BluetoothClass btclass = device.getBluetoothClass();
-		if (btclass == null) contents.put("BluetoothClass", null);
-		else {
-			contents.put("Major Class", getDeviceMajorType(btclass.getMajorDeviceClass()));
-			contents.put("Minor Class", getDeviceType(btclass.getDeviceClass()));
-			contents.put("Has Service Audio", String.valueOf(
-					btclass.hasService(BluetoothClass.Service.AUDIO)));
-			contents.put("Has Service Capture", String.valueOf(
-					btclass.hasService(BluetoothClass.Service.CAPTURE)));
-			contents.put("Has Service Information", String.valueOf(
-					btclass.hasService(BluetoothClass.Service.INFORMATION)));
-			contents.put("Has Service Limited Discoverability", String.valueOf(
-					btclass.hasService(BluetoothClass.Service.LIMITED_DISCOVERABILITY)));
-			contents.put("Has Service Networking", String.valueOf(
-					btclass.hasService(BluetoothClass.Service.NETWORKING)));
-			contents.put("Has Service Object Transfer", String.valueOf(
-					btclass.hasService(BluetoothClass.Service.OBJECT_TRANSFER)));
-			contents.put("Has Service Positioning", String.valueOf(
-					btclass.hasService(BluetoothClass.Service.POSITIONING)));
-			contents.put("Has Service Render", String.valueOf(
-					btclass.hasService(BluetoothClass.Service.RENDER)));
-			contents.put("Has Service Telephony", String.valueOf(
-					btclass.hasService(BluetoothClass.Service.TELEPHONY)));
-		}
-		if (API >= 11 && mA2dpProfile != null) {
-			contents.put("A2DP Profile Connection State", getProfileState(mA2dpProfile.getConnectionState(device)));
-			// I reported bug, issue 29394
-//			contents.put("A2DP Profile Is Playing", String.valueOf(mA2dpProfile.isA2dpPlaying(device)));
-		}
-		if (API >= 11 && mHeadsetProfile != null) {
-			contents.put("Headset Profile Connection State", getProfileState(mHeadsetProfile.getConnectionState(device)));
-			contents.put("Headset Profile Is Audio Connected", String.valueOf(mHeadsetProfile.isAudioConnected(device)));
-		}
-		if (API >= 14 && mHealthProfile != null) {
-			contents.put("Health Profile Connection State", getProfileState(mHealthProfile.getConnectionState(device)));
-		}
-		
-		return contents;
-	}
 
 	@Override
-	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (API < 11 || !super.startListening(onlyIfCallbackSet)) return false;
+	public void start() {
+		if (API < 11 || isActive()) return;
+
 		BluetoothProfile.ServiceListener listener = new BluetoothProfile.ServiceListener() {			
 			@Override
 			public void onServiceDisconnected(int profile) {
-				if (getCallback() != null) ((Callback) getCallback()).onServiceDisconnected(profile);			
+                if (!isActionAllowed(ACTIVE_ACTION_DISCONNECTED)) return;
+                //
+                setActionTime(ACTIVE_ACTION_DISCONNECTED);
+				((Callbacks) mCallbacks).onServiceDisconnected(profile);
 			}
 			@Override
 			public void onServiceConnected(int profile, BluetoothProfile proxy) {
-				// Must be at least API 11 if this is called
-				if (profile == BluetoothProfile.A2DP) mA2dpProfile = (BluetoothA2dp) proxy;
+                if (!isActionAllowed(ACTIVE_ACTION_CONNECTED)) return;
+
+                if (profile == BluetoothProfile.A2DP) mA2dpProfile = (BluetoothA2dp) proxy;
 				else if (profile == BluetoothProfile.HEADSET) mHeadsetProfile = (BluetoothHeadset) proxy;
 				else if (API >= 14 && profile == BluetoothProfile.HEALTH) mHealthProfile = (BluetoothHealth) proxy;
-				
-				if (getCallback() != null) ((Callback) getCallback()).onServiceConnected(profile, proxy);
+
+                setActionTime(ACTIVE_ACTION_CONNECTED);
+				((Callbacks) mCallbacks).onServiceConnected(profile, proxy);
 			}
 		};
 		
@@ -639,15 +542,16 @@ public class Bluetooth extends ListeningElement {
 		a = mBluetoothAdapter.getProfileProxy(getContext(), listener, BluetoothProfile.A2DP);
 		b = mBluetoothAdapter.getProfileProxy(getContext(), listener, BluetoothProfile.HEADSET);
 		if (API >= 14) c = mBluetoothAdapter.getProfileProxy(getContext(), listener, BluetoothProfile.HEALTH);
-		return setListening(a || b || c);		
+
+        if (a || b || c) super.start();
 	}
 
 	@Override
-	public boolean stopListening() {
-		if (API < 11 || !super.stopListening()) return false;
+	public void stop() {
+		if (API < 11 || !isActive()) return;
 		mBluetoothAdapter.closeProfileProxy(BluetoothProfile.A2DP, mA2dpProfile);
 		mBluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, mHeadsetProfile);
 		if (API >= 14) mBluetoothAdapter.closeProfileProxy(BluetoothProfile.HEALTH, mHealthProfile);
-		return !setListening(false);
+		super.stop();
 	}
 }

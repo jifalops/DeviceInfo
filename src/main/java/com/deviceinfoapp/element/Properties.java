@@ -7,7 +7,7 @@ import com.deviceinfoapp.util.ShellHelper;
 import java.util.LinkedHashMap;
 
 
-public class Properties extends Element {
+public class Properties extends AbsElement {
 
 	public Properties(Context context) {
 		super(context);

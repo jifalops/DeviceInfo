@@ -1,4 +1,4 @@
-package com.deviceinfoapp.model;
+package com.deviceinfoapp.viewable;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,18 +9,23 @@ import com.deviceinfoapp.R;
 /**
  * Created by Jake on 7/17/13.
  */
-public abstract class AbsItem1 implements Item {
-    private final CharSequence mText;
+public abstract class AbsItem1 extends AbsItem {
+    private CharSequence mText;
     private final int mLayoutRes;
 
-    public AbsItem1(CharSequence text, int layoutRes) {
+    public AbsItem1(CharSequence text, int layoutRes, int[] actions) {
+        super(actions);
         mText = text;
         mLayoutRes = layoutRes;
     }
 
-    public CharSequence getText() {
-        return mText;
-    }
+//    public void setText(final CharSequence text) {
+//        mText = text;
+//    }
+//
+//    public CharSequence getText() {
+//        return mText;
+//    }
 
     @Override
     public View getView(LayoutInflater inflater, View convertView) {

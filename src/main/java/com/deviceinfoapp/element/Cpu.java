@@ -14,9 +14,9 @@ import com.deviceinfoapp.util.BackgroundRepeatingTask;
 import com.deviceinfoapp.util.ShellHelper;
 
 //TODO exact current frequency???
-public class Cpu extends ListeningElement {
+public class Cpu extends ActiveElement {
 	
-	public interface Callback extends ListeningElement.Callback {
+	public interface Callback extends Callbacks {
 		void onUpdated();
 	}
 	
@@ -58,7 +58,7 @@ public class Cpu extends ListeningElement {
 		mUpdateTask.setCallback(new Runnable() {			
 			@Override
 			public void run() {
-				if (getCallback() != null) ((Callback) getCallback()).onUpdated(); 
+				if (getCallbacks() != null) ((Callback) getCallbacks()).onUpdated();
 			}
 		});
 		
@@ -901,14 +901,14 @@ public class Cpu extends ListeningElement {
 	
 	@Override
 	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.startListening(onlyIfCallbackSet)) return false;
+		if (!super.start(onlyIfCallbackSet)) return false;
 		mUpdateTask.start();
 		return setListening(true);
 	}
 	
 	@Override
-	public boolean stopListening() {
-		if (!super.stopListening()) return false;
+	public boolean stop() {
+		if (!super.stop()) return false;
 		mUpdateTask.stop();
 		return !setListening(false);
 	}

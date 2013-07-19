@@ -29,7 +29,7 @@ public class Cellular extends ThrottledListeningElement {
 	public static final int THROTTLE_INDEX_CELL_LOCATION = 0;
 	
 	/** Methods correspond to PhoneStateListener methods */
-	public interface Callback extends ListeningElement.Callback {
+	public interface Callback extends Callbacks {
 		void onCallForwardingIndicatorChanged(boolean cfi);
 		void onCallStateChanged(String incomingNumber);
 		void onCellLocationChanged();
@@ -303,7 +303,7 @@ public class Cellular extends ThrottledListeningElement {
 
 	@Override
 	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.startListening(onlyIfCallbackSet)) return false;
+		if (!super.start(onlyIfCallbackSet)) return false;
 		mListener = new MyPhoneStateListener();
 		mTelephonyManager.listen(mListener,
 			PhoneStateListener.LISTEN_CALL_FORWARDING_INDICATOR
@@ -319,8 +319,8 @@ public class Cellular extends ThrottledListeningElement {
 	}
 	
 	@Override
-	public boolean stopListening() {
-		if (!super.stopListening()) return false;
+	public boolean stop() {
+		if (!super.stop()) return false;
 		mTelephonyManager.listen(mListener, PhoneStateListener.LISTEN_NONE);
 		return !setListening(false);
 	}
@@ -354,9 +354,9 @@ public class Cellular extends ThrottledListeningElement {
 		// Cellular info
 		contents.put("MCC", String.valueOf(getMcc()));
 		contents.put("MNC", String.valueOf(getMnc()));
-		contents.put("Is Listening", String.valueOf(isListening()));
+		contents.put("Is Listening", String.valueOf(isActive()));
 		contents.put("Update Frequency", String.valueOf(getUpdateThrottle(THROTTLE_INDEX_CELL_LOCATION)));
-		contents.put("Last Update Timestamp", String.valueOf(getTimestamp(THROTTLE_INDEX_CELL_LOCATION)));
+		contents.put("Last Update Timestamp", String.valueOf(getActionTime(THROTTLE_INDEX_CELL_LOCATION)));
 		contents.put("Radio Version", getRadioVersion());
 		contents.put("Baseband", getBaseband());
 		contents.put("RIL Version", getRilVersion());
@@ -447,51 +447,51 @@ public class Cellular extends ThrottledListeningElement {
 		@Override
 		public void onCallForwardingIndicatorChanged(boolean cfi) {
 			
-			if (getCallback() != null) ((Callback) getCallback()).onCallForwardingIndicatorChanged(cfi);
+			if (getCallbacks() != null) ((Callback) getCallbacks()).onCallForwardingIndicatorChanged(cfi);
 		}
 		
 		@Override
 		public void onCallStateChanged(int state, String incomingNumber) {
 			
-			if (getCallback() != null) ((Callback) getCallback()).onCallStateChanged(incomingNumber);
+			if (getCallbacks() != null) ((Callback) getCallbacks()).onCallStateChanged(incomingNumber);
 		}
 		
 		@Override
 		public void onCellLocationChanged(CellLocation location) {
 			if (!isUpdateAllowed(THROTTLE_INDEX_CELL_LOCATION)) return;
-			setTimestamp(THROTTLE_INDEX_CELL_LOCATION);
+			setActionTime(THROTTLE_INDEX_CELL_LOCATION);
 			mCellLocation = location;
-			if (getCallback() != null) ((Callback) getCallback()).onCellLocationChanged();
+			if (getCallbacks() != null) ((Callback) getCallbacks()).onCellLocationChanged();
 		}
 		
 		@Override
 		public void onDataActivity(int direction) {
 			
-			if (getCallback() != null) ((Callback) getCallback()).onDataActivity();
+			if (getCallbacks() != null) ((Callback) getCallbacks()).onDataActivity();
 		}
 		
 		@Override
 		public void onDataConnectionStateChanged(int state, int networkType) {
 			
-			if (getCallback() != null) ((Callback) getCallback()).onDataConnectionStateChanged();
+			if (getCallbacks() != null) ((Callback) getCallbacks()).onDataConnectionStateChanged();
 		}
 		
 		@Override
 		public void onMessageWaitingIndicatorChanged(boolean mwi) {
 			
-			if (getCallback() != null) ((Callback) getCallback()).onMessageWaitingIndicatorChanged(mwi);
+			if (getCallbacks() != null) ((Callback) getCallbacks()).onMessageWaitingIndicatorChanged(mwi);
 		}
 		
 		@Override
 		public void onServiceStateChanged(ServiceState serviceState) {
 			mServiceState = serviceState;
-			if (getCallback() != null) ((Callback) getCallback()).onServiceStateChanged();
+			if (getCallbacks() != null) ((Callback) getCallbacks()).onServiceStateChanged();
 		}
 		
 		@Override
 		public void onSignalStrengthsChanged(SignalStrength signalStrength) {
 			mSignalStrength = signalStrength;
-			if (getCallback() != null) ((Callback) getCallback()).onSignalStrengthsChanged();
+			if (getCallbacks() != null) ((Callback) getCallbacks()).onSignalStrengthsChanged();
 		}
 	}
 }

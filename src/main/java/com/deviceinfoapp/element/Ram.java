@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 
-public class Ram extends ListeningElement {
+public class Ram extends ActiveElement {
 	private static final String LOG_TAG = Ram.class.getSimpleName();
 	
-	public interface Callback extends ListeningElement.Callback {
+	public interface Callback extends Callbacks {
 		void onUpdated(LinkedHashMap<String, String> meminfo);
 	}
 	
@@ -35,7 +35,7 @@ public class Ram extends ListeningElement {
 		mUpdateTask.setCallback(new Runnable() {			
 			@Override
 			public void run() {
-				if (getCallback() != null) ((Callback) getCallback()).onUpdated(mMeminfo); 
+				if (getCallbacks() != null) ((Callback) getCallbacks()).onUpdated(mMeminfo);
 			}
 		});
 	}
@@ -90,14 +90,14 @@ public class Ram extends ListeningElement {
 	
 	@Override
 	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.startListening(onlyIfCallbackSet)) return false;
+		if (!super.start(onlyIfCallbackSet)) return false;
 		mUpdateTask.start();
 		return setListening(true);
 	}
 	
 	@Override
-	public boolean stopListening() {
-		if (!super.stopListening()) return false;
+	public boolean stop() {
+		if (!super.stop()) return false;
 		mUpdateTask.stop();
 		return !setListening(false);
 	}

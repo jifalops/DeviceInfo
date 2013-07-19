@@ -38,7 +38,6 @@ public class Elements {
     static {
         NAMES = new String[NUM_ELEMENTS];
 
-
         NAMES[OVERVIEW] = "Overview";
         NAMES[PROCESSORS] = "Processors";
         NAMES[BATTERY] = "Battery";

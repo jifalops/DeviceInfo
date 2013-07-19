@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 
-public class Keys extends Element {
+public class Keys extends AbsElement {
 	private static final int API = Build.VERSION.SDK_INT;
 	
 	public final String KEYCODE_0;
