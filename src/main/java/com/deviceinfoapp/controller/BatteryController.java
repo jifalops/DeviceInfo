@@ -43,10 +43,5 @@ public class BatteryController extends ActiveElementController implements Batter
     @Override
     public void onReceive(Context context, Intent intent) {
         ((Callbacks) mCallbacks).onReceive(context, intent);
-
-        // vvv  Do using ActiveElementController?
-        // TODO when this is called (up to fragment), update visible views
-//        You can check whether a given position is visible, using getFirstVisiblePosition() and getChildCount().
-        // dont wait for getView in Item, just setText from adapter.
     }
 }

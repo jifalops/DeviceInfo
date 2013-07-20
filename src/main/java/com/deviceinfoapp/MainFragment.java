@@ -1,6 +1,5 @@
 package com.deviceinfoapp;
 
-import android.bluetooth.BluetoothProfile;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -15,6 +14,7 @@ import android.widget.ExpandableListView;
 import com.deviceinfoapp.data.Elements;
 import com.deviceinfoapp.element.ActiveElement;
 import com.deviceinfoapp.element.UnavailableFeatureException;
+import com.deviceinfoapp.viewable.Item;
 import com.deviceinfoapp.viewable.ItemExpandableListAdapter;
 
 public class MainFragment extends Fragment implements ActiveElementController.Callbacks {
@@ -239,38 +239,21 @@ public class MainFragment extends Fragment implements ActiveElementController.Ca
     }
 
     @Override
-    public void onAction(int[] items, long timestamp) {
+    public void onAction(int action, long timestamp) {
+        int pos = mListView.getFirstVisiblePosition();
+        int count = mListView.getChildCount();
+        Item item;
+        for (int i = pos; i < count; ++i) {
+            item = (Item) mAdapter.
+        }
 
-    }
 
-
-    //
-    // BatteryController callbacks
-    //
-
-    @Override
-    public void onReceive() {
-
-    }
-
-    //
-    // BluetoothController callbacks
-    //
-
-    @Override
-    public void onServiceConnected(int profile, BluetoothProfile proxy) {
-       // ((ModelAdapter) getAdapter()).update();
-        mAdapter.notifyDataSetChanged();
+//        mAdapter.notifyDataSetChanged();
         showIndicator();
+
+        // vvv  Do using ActiveElementController?
+        // TODO when this is called (up to fragment), update visible views
+//        You can check whether a given position is visible, using getFirstVisiblePosition() and getChildCount().
+        // dont wait for getView in Item, just setText from adapter.
     }
-
-    @Override
-    public void onServiceDisconnected(int profile) {
-       // getAdapter().update();
-        mAdapter.notifyDataSetChanged();
-        showIndicator();
-    }
-
-
-
 }
