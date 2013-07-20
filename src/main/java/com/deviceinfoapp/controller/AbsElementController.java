@@ -15,16 +15,13 @@ import java.util.List;
 public abstract class AbsElementController {
     protected static final int API = Build.VERSION.SDK_INT;
 
-    // TODO move to child classes
     public abstract List<Item> getData();
 
     protected Context mContext;
     protected AbsElement mElement;
-    protected final List<Item> mData;
 
     public AbsElementController(Context context) {
         mContext = context;
-        mData = new ArrayList<Item>();
     }
 
     public AbsElement getElement() {

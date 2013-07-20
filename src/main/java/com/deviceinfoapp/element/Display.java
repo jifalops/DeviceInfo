@@ -14,11 +14,10 @@ import com.deviceinfoapp.util.ShellHelper;
 import java.util.LinkedHashMap;
 
 public class Display extends AbsElement {
-	private static final int API = Build.VERSION.SDK_INT;
-	
-	private android.view.Display mDisplay;
-    private DisplayMetrics mDisplayMetrics;
-    
+
+    private static final String PROP_MAX_TOUCH = "ro.product.max_num_touch";
+
+
     // DisplayMetrics constants
     public final String DENSITY_LOW;
     public final String DENSITY_MEDIUM;
@@ -56,6 +55,9 @@ public class Display extends AbsElement {
 	public final String SIZE_NORMAL;
 	public final String SIZE_LARGE;
 	public final String SIZE_XLARGE;
+
+    private android.view.Display mDisplay;
+    private DisplayMetrics mDisplayMetrics;
 	
 	public Display(Context context) {
 		super(context);
@@ -228,7 +230,7 @@ public class Display extends AbsElement {
     
     // TODO touch test
     public int getMaxSimultaneousTouch() {
-    	String s = ShellHelper.getProp("ro.product.max_num_touch");
+    	String s = ShellHelper.getProp(PROP_MAX_TOUCH);
     	if (s == null || !s.matches("[0-9]{1,4}")) return 0;
     	int value = 0;
     	try { value = Integer.valueOf(s); }
@@ -288,36 +290,4 @@ public class Display extends AbsElement {
     		return context.getResources().getConfiguration().smallestScreenWidthDp;
     	else return 0;
     }
-    
-    @Override
-	public LinkedHashMap<String, String> getContents() {
-    	LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-		
-		contents.put("Density DPI String", getDensityDpiString());
-		contents.put("Density DPI", String.valueOf(getDensityDpi()));
-		contents.put("X DPI", String.valueOf(getXDpi()));
-		contents.put("Y DPI", String.valueOf(getYDpi()));
-		contents.put("Logical Density", String.valueOf(getLogicalDensity()));
-		contents.put("Scaled Density", String.valueOf(getScaledDensity()));
-		contents.put("Font Scale", String.valueOf(getFontScale(getContext())));
-		contents.put("Width (pixel)", String.valueOf(getWidth()));
-		contents.put("Height (pixel)", String.valueOf(getHeight()));
-		contents.put("Diagonal (pixel)", String.valueOf(getDiagonal()));
-		contents.put("Width (inch)", String.valueOf(getWidthInches()));
-		contents.put("Height (inch)", String.valueOf(getHeightInches()));
-		contents.put("Diagonal (inch)", String.valueOf(getDiagonalInches()));
-		contents.put("Refresh Rate", String.valueOf(getRefreshRate()));
-		contents.put("Rotation (degrees)", String.valueOf(getRotationDegrees()));
-		contents.put("Pixel Format", getPixelFormatString());
-		contents.put("Is Touch Screen", String.valueOf(isTouchScreen(getContext())));
-		contents.put("Max Simultaneous Touch", String.valueOf(getMaxSimultaneousTouch()));
-		contents.put("Screen Size String", getScreenSizeString(getContext()));
-		contents.put("Is Screen Long", String.valueOf(isScreenLong(getContext())));
-		contents.put("Orientation String", getOrientationString(getContext()));
-		contents.put("Screen Height DP", String.valueOf(getScreenHeightDp(getContext())));
-		contents.put("Screen Width DP", String.valueOf(getScreenWidthDp(getContext())));
-		contents.put("Smallest Screen Width DP", String.valueOf(getSmallestScreenWidthDp(getContext())));
-		
-		return contents;
-	}
 }

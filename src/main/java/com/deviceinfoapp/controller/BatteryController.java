@@ -7,6 +7,7 @@ import com.deviceinfoapp.element.Battery;
 import com.deviceinfoapp.viewable.Item;
 import com.deviceinfoapp.viewable.Item2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,17 +28,19 @@ public class BatteryController extends ActiveElementController implements Batter
     public List<Item> getData() {
         Battery e = (Battery) mElement;
         int[] actions = new int[] {Battery.ACTION_BATTERY};
-        mData.clear();
-        mData.add(new Item2("Level", e.getLevel() + "/" + e.getLevelMax(), actions));
-        mData.add(new Item2("Temperature (C)", String.valueOf(e.getTemperature()), actions));
-        mData.add(new Item2("Status", e.getChargingStatus(), actions));
-        mData.add(new Item2("Plugged In Status", e.getPluggedInStatus(), actions));
-        mData.add(new Item2("Voltage (mV)", String.valueOf(e.getVoltage()), actions));
-        mData.add(new Item2("Technology", e.getTechnology(), actions));
-        mData.add(new Item2("Health", e.getHealth(), actions));
+
+        List<Item> data = new ArrayList<Item>();
+
+        data.add(new Item2("Level", e.getLevel() + "/" + e.getLevelMax(), actions));
+        data.add(new Item2("Temperature (C)", String.valueOf(e.getTemperature()), actions));
+        data.add(new Item2("Status", e.getChargingStatus(), actions));
+        data.add(new Item2("Plugged In Status", e.getPluggedInStatus(), actions));
+        data.add(new Item2("Voltage (mV)", String.valueOf(e.getVoltage()), actions));
+        data.add(new Item2("Technology", e.getTechnology(), actions));
+        data.add(new Item2("Health", e.getHealth(), actions));
 //        data.add(new Item2("Battery Is Present", String.valueOf(e.isBatteryPresent())));
 
-        return mData;
+        return data;
     }
 
     @Override

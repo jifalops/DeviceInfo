@@ -46,4 +46,7 @@
 
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
+
+    <string name="unavailable_feature">Not available on your device.</string>
+
 </resources>

@@ -9,9 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Features extends AbsElement {
-	private static final int API = Build.VERSION.SDK_INT;
-	
-	private final PackageManager mPackageManager;
+
+	private PackageManager mPackageManager;
 	private final List<String> mAvailable;
 	private final List<String> mUnavailable;
 	
@@ -87,20 +86,4 @@ public class Features extends AbsElement {
 		if (mPackageManager.hasSystemFeature(feature)) mAvailable.add(feature);
 		else mUnavailable.add(feature);
 	}
-	
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-		
-		for (int i = 0; i < mAvailable.size(); ++i) {
-			contents.put("Available Feature " + i, mAvailable.get(i));
-		}
-		
-		for (int i = 0; i < mUnavailable.size(); ++i) {
-			contents.put("Unavailable Feature " + i, mUnavailable.get(i));
-		}
-		
-		return contents;
-	}
-
 }

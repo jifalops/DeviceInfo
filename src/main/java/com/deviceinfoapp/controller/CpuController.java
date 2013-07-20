@@ -9,6 +9,7 @@ import com.deviceinfoapp.element.Cpu;
 import com.deviceinfoapp.viewable.Item;
 import com.deviceinfoapp.viewable.Item2;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,8 @@ public class CpuController extends ActiveElementController implements Cpu.Callba
     public List<Item> getData() {
         Cpu e = (Cpu) mElement;
         int[] actions = new int[] {Cpu.ACTION_UPDATED};
-        mData.clear();
+
+        List<Item> data = new ArrayList<Item>();
 
         // Main TODO started to fix main, but want to use the setup from old app (elementview package)
 //        for (int i = 0; i < e.getCpuinfo().size(); ++i) {
@@ -169,7 +171,7 @@ public class CpuController extends ActiveElementController implements Cpu.Callba
 //            return contents;
 //        }
 
-        return mData;
+        return data;
     }
 
     @Override

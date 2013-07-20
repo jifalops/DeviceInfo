@@ -13,8 +13,9 @@ import java.util.List;
 
 
 public class Keys extends AbsElement {
-	private static final int API = Build.VERSION.SDK_INT;
-	
+
+    private static final String DEVICE_ALLY = "Ally";
+
 	public final String KEYCODE_0;
 	public final String KEYCODE_1;
 	public final String KEYCODE_2;
@@ -232,7 +233,7 @@ public class Keys extends AbsElement {
 	
 	public Keys(Context context) throws UnavailableFeatureException {
 		super(context);
-		if (Build.MODEL.equals("Ally")) {
+		if (Build.MODEL.equals(DEVICE_ALLY)) {
 			throw new UnavailableFeatureException("The LG Ally cannot use this class.");
 		}
 		KEYCODE_0 = context.getString(R.string.keycode_0);
@@ -939,23 +940,4 @@ public class Keys extends AbsElement {
 		
 		return null;
 	}
-	
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-		int key;
-		for (int i = 0; i < mAvailable.size(); ++i) {
-			key = mAvailable.get(i);
-			contents.put("Available Key " + i, getKeyName(key) + " (" + key + ")");
-		}
-		
-		for (int i = 0; i < mUnavailable.size(); ++i) {
-			key = mUnavailable.get(i);
-			contents.put("Unavailable Key " + i, getKeyName(key) + " (" + key + ")");
-		}
-		
-		return contents;
-	}
-
-	
 }

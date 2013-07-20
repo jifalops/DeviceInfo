@@ -5,4 +5,5 @@
     <string name="platform_gingerbread">Gingerbread</string>
     <string name="platform_honeycomb">Honeycomb</string>
     <string name="platform_ice_cream_sandwich">Ice Cream Sandwich</string>
+    <string name="platform_jelly_bean">Jelly Bean</string>
 </resources>

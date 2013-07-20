@@ -1,17 +1,16 @@
 package com.deviceinfoapp.element;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import android.content.Context;
 import android.util.Log;
 
 import com.deviceinfoapp.util.BackgroundRepeatingTask;
 import com.deviceinfoapp.util.ShellHelper;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 //TODO exact current frequency???
 public class Cpu extends ActiveElement {
@@ -72,6 +71,7 @@ public class Cpu extends ActiveElement {
         mUpdateTask.setCallback(new Runnable() {
             @Override
             public void run() {
+                setActionTime(ACTION_UPDATED);
                 ((Callbacks) mCallbacks).onUpdated(mNumStatsUpdated);
             }
         });

@@ -22,7 +22,12 @@ public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 	public static final float OPENGLES_VERSION_11 = 1.1f;
 	public static final float OPENGLES_VERSION_20 = 2.0f;
 
-	public interface Callback extends Callbacks {
+    private static final int ACTIVE_ACTIONS = 3;
+    public static final int ACTION_CREATED = 0;
+    public static final int ACTION_CHANGED = 1;
+    public static final int ACTION_DRAW = 2;
+
+	public interface Callbacks extends ActiveElement.Callbacks {
 		/** Corresponds to GLSurfaceView.Renderer.onSurfaceCreated(); */
 		void onSurfaceCreated(GL10 gl, EGLConfig config);
 		/** Corresponds to GLSurfaceView.Renderer.onSurfaceChanged(); */
@@ -33,21 +38,15 @@ public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 	
 	private final float mOpenGlesVersion;
 	private OpenGles mOpenGles;
-	private final GLSurfaceView mGlSurfaceView;
+	private GLSurfaceView mGlSurfaceView;
 	
-	public Graphics(Context context, GLSurfaceView glSurfaceView) {
-		super(context);
-		mGlSurfaceView = glSurfaceView;
+	public Graphics(Context context, Graphics.Callbacks callbacks) {
+		super(context, callbacks);
+
 		String ver = openGlesVersion(context);
 		mOpenGlesVersion = ver == null ? 0.0f : Float.valueOf(ver);
 
-		if (Build.VERSION.SDK_INT >= 8) {
-			glSurfaceView.setEGLContextClientVersion((int) mOpenGlesVersion);
-		}
-
-		glSurfaceView.setRenderer(this);
-		glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-		glSurfaceView.requestRender();
+        setActiveActionCount(ACTIVE_ACTIONS);
 	}
 	
 	/** 
@@ -67,6 +66,18 @@ public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 	public GLSurfaceView getGlSurfaceView() {
 		return mGlSurfaceView;
 	}
+
+    public void setGlSurfaceView(GLSurfaceView glSurfaceView) {
+        mGlSurfaceView = glSurfaceView;
+
+        if (Build.VERSION.SDK_INT >= 8) {
+            glSurfaceView.setEGLContextClientVersion((int) mOpenGlesVersion);
+        }
+
+        glSurfaceView.setRenderer(this);
+        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        glSurfaceView.requestRender();
+    }
 	
 	/** 
 	 * Get the highest supported OpenGL ES version.
@@ -88,7 +99,7 @@ public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 	}
 	
 	
-	private abstract class OpenGles implements ContentsMapper {
+	private abstract class OpenGles {
 		protected final float mOpenGlesVersion;
 		
 		protected String mRenderer;
@@ -136,24 +147,6 @@ public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 				GLES20.glGetIntegerv(glConst, placeholder, 0);
 			return placeholder[0];
 		}
-		
-		@Override
-		public LinkedHashMap<String, String> getContents() {
-			LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-			
-			contents.put("Version", String.valueOf(getOpenGlesVersion()));
-			contents.put("Renderer", getRenderer());
-			contents.put("Version", getVersion());
-			contents.put("Vendor", getVendor());
-			contents.put("MaxTextureSize", String.valueOf(getMaxTextureSize()));	
-			String[] extensions = getExtensions();
-			if (extensions != null) {
-				for (int i = 0; i < extensions.length; ++i) {
-					contents.put("Extension " + i, extensions[i]);
-				}
-			}
-			return contents;
-		}
 	}
 	
 	private class OpenGles10 extends OpenGles {
@@ -179,20 +172,10 @@ public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 		public int getMaxTextureStackDepth() {
 			return mMaxTextureStackDepth;
 		}
-
-		@Override
-		public LinkedHashMap<String, String> getContents() {
-			LinkedHashMap<String, String> contents = super.getContents();
-			contents.put("MaxTextureUnits", String.valueOf(getMaxTextureUnits()));
-			contents.put("MaxTextureStackDepth", String.valueOf(getMaxTextureStackDepth()));
-			return contents;
-		}
 	}
 	
 	private class OpenGles11 extends OpenGles10 {
-		public OpenGles11() {
-			super();
-		}		
+		// same as parent
 	}
 	
 	private class OpenGles20 extends OpenGles {
@@ -218,59 +201,50 @@ public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 		public int getMaxRenderBufferSize() {
 			return mMaxRenderBufferSize;
 		}
-
-		@Override
-		public LinkedHashMap<String, String> getContents() {
-			LinkedHashMap<String, String> contents = super.getContents();
-			contents.put("MaxTextureImageUnits", String.valueOf(getMaxTextureImageUnits()));
-			contents.put("MaxRenderBufferSize", String.valueOf(getMaxRenderBufferSize()));
-			return contents;
-		}
 	}
 
 
 	@Override
-	public void onSurfaceCreated(GL10 gl, EGLConfig config) {		
+	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        if (!isActionAllowed(ACTION_CREATED)) return;
+
 		if (mOpenGles == null) {
 			if (mOpenGlesVersion == OPENGLES_VERSION_10) mOpenGles = new OpenGles10();
 			else if (mOpenGlesVersion == OPENGLES_VERSION_11) mOpenGles = new OpenGles11();
 			else if (mOpenGlesVersion == OPENGLES_VERSION_20) mOpenGles = new OpenGles20();
 		}
-		if ((Callback) getCallbacks() != null) ((Callback) getCallbacks()).onSurfaceCreated(gl, config);
+
+        setActionTime(ACTION_CREATED);
+		((Callbacks) mCallbacks).onSurfaceCreated(gl, config);
 	}
 	
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
+        if (!isActionAllowed(ACTION_CHANGED)) return;
 
-		if ((Callback) getCallbacks() != null) ((Callback) getCallbacks()).onSurfaceChanged(gl, width, height);
+        setActionTime(ACTION_CHANGED);
+		((Callbacks) mCallbacks).onSurfaceChanged(gl, width, height);
 	}
 	
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		
-		if ((Callback) getCallbacks() != null) ((Callback) getCallbacks()).onDrawFrame(gl);
-	}
+        if (!isActionAllowed(ACTION_DRAW)) return;
 
-	
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = super.getContents();
-		contents.put("OpenGL ES Version", String.valueOf(getOpenGlesVersion()));
-		if (mOpenGles != null) contents.putAll(mOpenGles.getContents());		
-		return contents;
+        setActionTime(ACTION_DRAW);
+		((Callbacks) mCallbacks).onDrawFrame(gl);
 	}
 	
 	@Override
-	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.start(onlyIfCallbackSet)) return false;
+	public void start() {
+		if (isActive()) return;
 		onResume();
-		return setListening(true);
+		super.start();
 	}
 	
 	@Override
-	public boolean stop() {
-		if (!super.stop()) return false;
+	public void stop() {
+		if (!isActive()) return;
 		onPause();
-		return !setListening(false);
+		super.stop();
 	}
 }

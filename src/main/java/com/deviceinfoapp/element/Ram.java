@@ -14,16 +14,31 @@ import java.util.Map;
 
 public class Ram extends ActiveElement {
 	private static final String LOG_TAG = Ram.class.getSimpleName();
-	
-	public interface Callback extends Callbacks {
+
+    private static final String MEMINFO_PROC = "meminfo";
+    private static final String MEMINFO_DELIM = ":";
+    private static final String KEY_TOTAL = "MemTotal";
+    private static final String KEY_FREE = "MemFree";
+
+    public static final int FREQUENCY_HIGH = 1000;
+    public static final int FREQUENCY_MEDIUM = 2000;
+    public static final int FREQUENCY_LOW = 3000;
+
+    private static final int ACTIVE_ACTIONS = 1;
+    public static final int ACTION_UPDATE = 0;
+
+	public interface Callbacks extends ActiveElement.Callbacks {
 		void onUpdated(LinkedHashMap<String, String> meminfo);
 	}
-	
-	private final LinkedHashMap<String, String> mMeminfo;
-	private final BackgroundRepeatingTask mUpdateTask;
-	
-	public Ram(Context context) {
-		super(context);
+
+	private LinkedHashMap<String, String> mMeminfo;
+	private BackgroundRepeatingTask mUpdateTask;
+    private int mUpdateFrequency;
+
+	public Ram(Context context, Ram.Callbacks callbacks) {
+		super(context, callbacks);
+
+        mUpdateFrequency = FREQUENCY_MEDIUM;
 		mMeminfo = new LinkedHashMap<String, String>();
 		mUpdateTask = new BackgroundRepeatingTask(new Runnable() {			
 			@Override
@@ -31,23 +46,27 @@ public class Ram extends ActiveElement {
 				updateMeminfo();
 			}
 		});		
-		mUpdateTask.setInterval(2000);
+		mUpdateTask.setInterval(mUpdateFrequency);
 		mUpdateTask.setCallback(new Runnable() {			
 			@Override
 			public void run() {
-				if (getCallbacks() != null) ((Callback) getCallbacks()).onUpdated(mMeminfo);
+                setActionTime(ACTION_UPDATE);
+				((Callbacks) mCallbacks).onUpdated(new LinkedHashMap<String, String>(mMeminfo));
 			}
 		});
+
+        setActiveActionCount(ACTIVE_ACTIONS);
 	}
 	
 	/** Get the current meminfo from /proc */
 	public boolean updateMeminfo() {
-        List<String> meminfo = ShellHelper.getProc("meminfo");
+        // Throttle set by frequency (because it's not a system event but my own)
+        List<String> meminfo = ShellHelper.getProc(MEMINFO_PROC);
         if (meminfo == null || meminfo.isEmpty()) return false;        
         String[] parts = null;
         mMeminfo.clear();
         for (String s : meminfo) {
-        	parts = s.split(":");
+        	parts = s.split(MEMINFO_DELIM);
         	if (parts.length != 2) continue;
         	mMeminfo.put(parts[0].trim(), parts[1].trim());
         }
@@ -56,7 +75,7 @@ public class Ram extends ActiveElement {
     }
 	
 	public Map<String, String> getMeminfo() {
-		return mMeminfo;
+		return new LinkedHashMap<String, String>(mMeminfo);
 	}
 	
 	public String getMeminfo(String key) {
@@ -65,11 +84,11 @@ public class Ram extends ActiveElement {
     }
 	
 	public String getTotal() {
-		return getMeminfo("MemTotal");
+		return getMeminfo(KEY_TOTAL);
     }
 	
 	public String getFree() {
-        return getMeminfo("MemFree");     
+        return getMeminfo(KEY_FREE);
     }
 	
 	public String getUsagePercent() {
@@ -89,24 +108,16 @@ public class Ram extends ActiveElement {
 	}
 	
 	@Override
-	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.start(onlyIfCallbackSet)) return false;
+	public void start() {
+		if (isActive()) return;
 		mUpdateTask.start();
-		return setListening(true);
+		super.start();
 	}
 	
 	@Override
-	public boolean stop() {
-		if (!super.stop()) return false;
+	public void stop() {
+		if (!isActive()) return;
 		mUpdateTask.stop();
-		return !setListening(false);
-	}
-	
-	
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-//		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();			
-		return mMeminfo;
-//		return contents;
+		super.stop();
 	}
 }

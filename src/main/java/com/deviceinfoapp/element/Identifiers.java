@@ -12,6 +12,10 @@ import java.util.List;
 
 
 public class Identifiers extends AbsElement {
+    
+    private static final String PROC_PHONE_ID = "phoneid";
+    private static final String NULL_STRING = "null";
+    private static final String PROP_SERIAL = "ro.serialno";
 
 	public final String ANDROID_ID;
 	public final String DEVICE_ID;
@@ -30,36 +34,20 @@ public class Identifiers extends AbsElement {
 		SUBSCRIBER_ID = tm.getSubscriberId();
 		ANDROID_ID = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 		DEVICE_SERIAL = getDeviceSerial();		
-		List<String> list = ShellHelper.getProc("phoneid");
+		List<String> list = ShellHelper.getProc(PROC_PHONE_ID);
 		if (list == null || list.isEmpty()) PHONE_ID = null;
 		else PHONE_ID = list.get(0);
 	}
 	
 	private String getDeviceSerial() {
 		String s = null;
-		if (Build.VERSION.SDK_INT >= 9) {
+		if (API >= 9) {
 			s = Build.SERIAL;
 			if (s != null && s.length() > 0 
-				&& !s.equals(Build.UNKNOWN) && !s.equalsIgnoreCase("null")) {
+				&& !s.equals(Build.UNKNOWN) && !s.equalsIgnoreCase(NULL_STRING)) {
 				return s;
 			}
 		}
-		return ShellHelper.getProp("ro.serialno");		
+		return ShellHelper.getProp(PROP_SERIAL);
 	}
-	
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-		
-		contents.put("Device ID", DEVICE_ID);
-		contents.put("Device Serial", DEVICE_SERIAL);
-		contents.put("Android ID", ANDROID_ID);
-		contents.put("Phone ID", PHONE_ID);
-		contents.put("SIM Serial", SIM_SERIAL);
-		contents.put("Line 1 Number", LINE_1_NUMBER);
-		contents.put("Subscriber ID", SUBSCRIBER_ID);
-		
-		return contents;
-	}
-
 }
