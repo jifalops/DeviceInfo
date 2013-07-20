@@ -185,7 +185,8 @@ public class Battery extends ActiveElement {
 		@Override
 		public void onReceive(Context context, Intent intent) {
             if (!isActionAllowed(ACTION_BATTERY)) return;
-			mLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+
+            mLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
 			mMaxLevel = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 0);
 			mVoltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0);
 			mTemp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10f;

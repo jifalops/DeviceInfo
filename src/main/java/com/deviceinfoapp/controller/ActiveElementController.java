@@ -35,7 +35,7 @@ public abstract class ActiveElementController extends AbsElementController imple
     }
 
     public boolean isActionable() {
-        return true;
+        return mElement != null;
     }
 
 

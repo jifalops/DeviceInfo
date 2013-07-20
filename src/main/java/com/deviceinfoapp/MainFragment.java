@@ -3,6 +3,7 @@ package com.deviceinfoapp;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -244,10 +245,10 @@ public class MainFragment extends Fragment implements ActiveElementController.Ca
         int count = mListView.getChildCount();
         Item item;
         for (int i = pos; i < count; ++i) {
-            item = (Item) mAdapter.
+            //item = (Item) mAdapter.g
         }
 
-
+        listVisibleRowsForExpandableGroup();
 //        mAdapter.notifyDataSetChanged();
         showIndicator();
 
@@ -255,5 +256,26 @@ public class MainFragment extends Fragment implements ActiveElementController.Ca
         // TODO when this is called (up to fragment), update visible views
 //        You can check whether a given position is visible, using getFirstVisiblePosition() and getChildCount().
         // dont wait for getView in Item, just setText from adapter.
+    }
+
+    public void listVisibleRowsForExpandableGroup()
+    {
+        int firstVis  = mListView.getFirstVisiblePosition();
+        int lastVis = mListView.getLastVisiblePosition();
+
+        int count = firstVis;
+
+        while (count <= lastVis)
+        {
+            long longposition = mListView.getExpandableListPosition(count);
+            int type = mListView.getPackedPositionType(longposition);
+            if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                int groupPosition = mListView.getPackedPositionGroup(longposition);
+                int childPosition = mListView.getPackedPositionChild(longposition);
+                Log.d("Test", "group: " + groupPosition + " and child: " + childPosition);
+            }
+            count++;
+
+        }
     }
 }

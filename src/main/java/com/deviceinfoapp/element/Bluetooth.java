@@ -17,8 +17,8 @@ import java.util.List;
 public class Bluetooth extends ActiveElement {
 
     private static final int ACTIVE_ACTIONS = 2;
-    public static final int ACTIVE_ACTION_CONNECTED = 0;
-    public static final int ACTIVE_ACTION_DISCONNECTED = 1;
+    public static final int ACTION_CONNECTED = 0;
+    public static final int ACTION_DISCONNECTED = 1;
 
 	public interface Callbacks extends ActiveElement.Callbacks {
 		void onServiceConnected(int profile, BluetoothProfile proxy);
@@ -520,20 +520,20 @@ public class Bluetooth extends ActiveElement {
 		BluetoothProfile.ServiceListener listener = new BluetoothProfile.ServiceListener() {			
 			@Override
 			public void onServiceDisconnected(int profile) {
-                if (!isActionAllowed(ACTIVE_ACTION_DISCONNECTED)) return;
+                if (!isActionAllowed(ACTION_DISCONNECTED)) return;
                 //
-                setActionTime(ACTIVE_ACTION_DISCONNECTED);
+                setActionTime(ACTION_DISCONNECTED);
 				((Callbacks) mCallbacks).onServiceDisconnected(profile);
 			}
 			@Override
 			public void onServiceConnected(int profile, BluetoothProfile proxy) {
-                if (!isActionAllowed(ACTIVE_ACTION_CONNECTED)) return;
+                if (!isActionAllowed(ACTION_CONNECTED)) return;
 
                 if (profile == BluetoothProfile.A2DP) mA2dpProfile = (BluetoothA2dp) proxy;
 				else if (profile == BluetoothProfile.HEADSET) mHeadsetProfile = (BluetoothHeadset) proxy;
 				else if (API >= 14 && profile == BluetoothProfile.HEALTH) mHealthProfile = (BluetoothHealth) proxy;
 
-                setActionTime(ACTIVE_ACTION_CONNECTED);
+                setActionTime(ACTION_CONNECTED);
 				((Callbacks) mCallbacks).onServiceConnected(profile, proxy);
 			}
 		};

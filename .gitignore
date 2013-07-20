@@ -25,6 +25,7 @@ local.properties
 *.iml
 build
 build.gradle
+out/
 
 
 

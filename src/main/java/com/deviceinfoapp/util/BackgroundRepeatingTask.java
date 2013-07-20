@@ -41,7 +41,9 @@ public class BackgroundRepeatingTask extends RepeatingTask {
 	public synchronized int getInterval() {
 		return mInterval;
 	}
-	
+
+    // TODO use handler
+
 	private class BackgroundTask extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -50,6 +52,7 @@ public class BackgroundRepeatingTask extends RepeatingTask {
 				publishProgress();
 				try { Thread.sleep(mInterval); } 
 				catch (InterruptedException e) {
+                    Thread.interrupted();
 					break;
 				}
 			}

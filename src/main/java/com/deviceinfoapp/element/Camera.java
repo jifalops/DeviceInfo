@@ -15,7 +15,6 @@ import com.deviceinfoapp.R;
 
 public class Camera extends AbsElement {
 	private static final String LOG_TAG = Camera.class.getSimpleName();
-	private static final int API = Build.VERSION.SDK_INT;
 	
 	public final String FACING_FRONT;
 	public final String FACING_BACK;
@@ -171,34 +170,6 @@ public class Camera extends AbsElement {
 	
 	public List<CameraWrapper> getCameras() {
 		return mCameras;
-	}
-	
-
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-		
-		contents.put("Number of Cameras", String.valueOf(mNumCameras));
-		
-		List<CameraWrapper> cameras = getCameras();
-		LinkedHashMap<String, String> params;
-		int paramIndex = 0;
-		for (int i = 0; i < cameras.size(); ++i) {
-			if (API >= 9) {
-				contents.put("Camera " + i + " Direction", cameras.get(i).getCameraDirection());
-				contents.put("Camera " + i + " Orientation (Degrees)", String.valueOf(cameras.get(i).getCameraOrientation()));
-			}
-			
-			params = cameras.get(i).getCameraParametersMap();
-			if (params != null) {		
-				for (String key : params.keySet()) {
-					contents.put("Camera " + i + " Parameter " + paramIndex, key + " = " + params.get(key));
-					++paramIndex;
-				}
-			}
-		}
-		
-		return contents;
 	}
 
 }

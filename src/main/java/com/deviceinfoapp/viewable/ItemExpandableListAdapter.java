@@ -156,6 +156,9 @@ public class ItemExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         public long getChildId(int groupPosition, int childPosition) {
+            if (groupPosition == 0) {
+                return childPosition;
+            }
             return mGroups[groupPosition][POSITION] + childPosition + 1;
         }
     }

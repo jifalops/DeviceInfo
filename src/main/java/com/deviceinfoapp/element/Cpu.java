@@ -15,36 +15,40 @@ import com.deviceinfoapp.util.ShellHelper;
 
 //TODO exact current frequency???
 public class Cpu extends ActiveElement {
-	
-	public interface Callback extends Callbacks {
-		void onUpdated();
+
+    private static final String CPU_INFO_LOCATION = "/sys/devices/system/cpu/cpu";
+    private static final String CPU_INFO_PROC = "cpuinfo";
+    private static final String CPU_STAT_PROC = "stat";
+
+    public static final int FREQUENCY_HIGH = 1000;
+    public static final int FREQUENCY_MEDIUM = 2000;
+    public static final int FREQUENCY_LOW = 5000;
+
+    private static final int ACTIVE_ACTIONS = 1;
+    public static final int ACTION_UPDATED = 0;
+
+    public interface Callbacks extends ActiveElement.Callbacks {
+		void onUpdated(int numCpuStatsUpdated);
 	}
-	
-	public static final int FREQUENCY_HIGH = 1000;
-	public static final int FREQUENCY_MEDIUM = 2000;
-	public static final int FREQUENCY_LOW = 5000;
-	
+
 	private List<String> mCpuinfo;
 	private final List<LogicalCpu> mLogicalCpus;
 	private final CpuStat mCpuStat;
 	
 	private int mNumStatsUpdated;
-	
-	private long mTimestamp;
-	private long mTimestampPrevious;
 
 	private final BackgroundRepeatingTask mUpdateTask;
 	
-	public Cpu(Context context) {
-		super(context);
-		mCpuinfo = ShellHelper.getProc("cpuinfo");
+	public Cpu(Context context, Cpu.Callbacks callbacks) {
+		super(context, callbacks);
+		mCpuinfo = ShellHelper.getProc(CPU_INFO_PROC);
 		mLogicalCpus = new ArrayList<LogicalCpu>();
 		mCpuStat = new CpuStat();
 		mUpdateTask = new BackgroundRepeatingTask(new Runnable() {			
 			@Override
 			public void run() {
-				setTimestamp();
-				mCpuinfo = ShellHelper.getProc("cpuinfo");
+                // Throttle set by frequency (because it's not a system event but my own)
+				mCpuinfo = ShellHelper.getProc(CPU_INFO_PROC);
 				updateCpuStats();
 				for (LogicalCpu c : mLogicalCpus) {
 					c.updateFrequency();
@@ -54,22 +58,25 @@ public class Cpu extends ActiveElement {
 				}
 			}
 		});
-		mUpdateTask.setInterval(FREQUENCY_MEDIUM);
-		mUpdateTask.setCallback(new Runnable() {			
-			@Override
-			public void run() {
-				if (getCallbacks() != null) ((Callback) getCallbacks()).onUpdated();
-			}
-		});
-		
+
 		File f = null;
 		int i = 0;
 		while (true) {
-			f = new File("/sys/devices/system/cpu/cpu" + i);
+			f = new File(CPU_INFO_LOCATION + i);
 			if (f.exists()) mLogicalCpus.add(new LogicalCpu(f, i));
 			else break;
 			++i;
 		}
+
+        mUpdateTask.setInterval(FREQUENCY_MEDIUM);
+        mUpdateTask.setCallback(new Runnable() {
+            @Override
+            public void run() {
+                ((Callbacks) mCallbacks).onUpdated(mNumStatsUpdated);
+            }
+        });
+
+        setActiveActionCount(ACTIVE_ACTIONS);
 	}	
 	
 	public void setUpdateInterval(int milliseconds) {
@@ -99,7 +106,7 @@ public class Cpu extends ActiveElement {
 	/** Updates the CpuStat for this and all logical CPUs. */
 	private void updateCpuStats() {
 		mNumStatsUpdated = 0;
-		List<String> stats = ShellHelper.getProc("stat");
+		List<String> stats = ShellHelper.getProc(CPU_STAT_PROC);
 		if (stats == null || stats.isEmpty()) return;
 		
 		String[] parts = null;
@@ -121,29 +128,22 @@ public class Cpu extends ActiveElement {
 		}
 	}
 	
-	/** Timestamp in milliseconds */
-	public synchronized long getTimestamp() {
-		return mTimestamp;
-	}
 	
-	public synchronized long getTimestampPrevious() {
-		return mTimestampPrevious;
-	}
-	
-	public synchronized long getTimestampDifference() {
-		return (mTimestamp - mTimestampPrevious);
-	}
-	
-	private synchronized void setTimestamp() {
-		mTimestampPrevious = mTimestamp;
-		mTimestamp = System.currentTimeMillis();
-	}
-	
-	
-	public class LogicalCpu implements ContentsMapper {
+	public class LogicalCpu {
 		private final String LOG_TAG = LogicalCpu.class.getSimpleName();
-		
-//		public final float bogoMips;
+
+        private static final String MAX_FREQUENCY = "/cpufreq/cpuinfo_max_freq";
+        private static final String MIN_FREQUENCY = "/cpufreq/cpuinfo_min_freq";
+        private static final String CURRENT_FREQUENCY = "/cpufreq/scaling_cur_freq";
+        private static final String AVAILABLE_FREQUENCIES = "/cpufreq/scaling_available_frequencies";
+        private static final String AVAILABLE_GOVERNERS = "/cpufreq/scaling_available_governors";
+        private static final String GOVERNER = "/cpufreq/scaling_governor";
+        private static final String DRIVER = "/cpufreq/scaling_driver";
+        private static final String TRANSITION_LATENCY = "/cpufreq/cpuinfo_transition_latency";
+        private static final String TRANSITIONS = "/cpufreq/stats/total_trans";
+        private static final String TIME_IN_FREQUENCY = "/cpufreq/stats/time_in_state";
+
+        //		public final float bogoMips;
 		private final int mId;
 		private final File mRoot;
 		private final CpuStat mCpuStat;
@@ -189,7 +189,7 @@ public class Cpu extends ActiveElement {
 		public int getMaxFrequency() {
 			if (mMaxFrequency == 0) {
 				List<String> list = ShellHelper.cat(
-					mRoot.getAbsolutePath() + "/cpufreq/cpuinfo_max_freq");
+					mRoot.getAbsolutePath() + MAX_FREQUENCY);
 				if (list == null || list.isEmpty()) return 0;
 				int value = 0;
 				try { value = Integer.valueOf(list.get(0)); }
@@ -203,7 +203,7 @@ public class Cpu extends ActiveElement {
 		public int getMinFrequency() {
 			if (mMinFrequency == 0) {
 				List<String> list = ShellHelper.cat(
-					mRoot.getAbsolutePath() + "/cpufreq/cpuinfo_min_freq");
+					mRoot.getAbsolutePath() + MIN_FREQUENCY);
 				if (list == null || list.isEmpty()) return 0;
 				int value = 0;
 				try { value = Integer.valueOf(list.get(0)); }
@@ -220,7 +220,7 @@ public class Cpu extends ActiveElement {
 		
 		public void updateFrequency() {
 			List<String> list = ShellHelper.cat(
-				mRoot.getAbsolutePath() + "/cpufreq/scaling_cur_freq");
+				mRoot.getAbsolutePath() + CURRENT_FREQUENCY);
 			if (list == null || list.isEmpty()) return;
 			int value = 0;
 			try { value = Integer.valueOf(list.get(0)); }
@@ -232,7 +232,7 @@ public class Cpu extends ActiveElement {
 		public int[] getAvailableFrequencies() {
 			if (mAvailableFrequencies == null) {
 				List<String> list = ShellHelper.cat(
-					mRoot.getAbsolutePath() + "/cpufreq/scaling_available_frequencies");
+					mRoot.getAbsolutePath() + AVAILABLE_FREQUENCIES);
 				if (list == null || list.isEmpty()) return null;
 				String[] results = list.get(0).split("\\s+");
 				if (results == null || results.length == 0) {
@@ -254,7 +254,7 @@ public class Cpu extends ActiveElement {
 		public String[] getAvailableGovernors() {
 			if (mAvailableGovernors == null) {
 				List<String> list = ShellHelper.cat(
-					mRoot.getAbsolutePath() + "/cpufreq/scaling_available_governors");
+					mRoot.getAbsolutePath() + AVAILABLE_GOVERNERS);
 				if (list == null || list.isEmpty()) return null;
 				mAvailableGovernors = list.get(0).split("\\s+");
 			}
@@ -268,7 +268,7 @@ public class Cpu extends ActiveElement {
 		
 		public void updateGovernor() {
 			List<String> list = ShellHelper.cat(
-					mRoot.getAbsolutePath() + "/cpufreq/scaling_governor");
+					mRoot.getAbsolutePath() + GOVERNER);
 			if (list == null || list.isEmpty()) return;
 			mCurGoverner = list.get(0);
 		}
@@ -277,7 +277,7 @@ public class Cpu extends ActiveElement {
 		public String getDriver() {
 			if (mDriver == null) {
 				List<String> list = ShellHelper.cat(
-					mRoot.getAbsolutePath() + "/cpufreq/scaling_driver");
+					mRoot.getAbsolutePath() + DRIVER);
 				if (list == null || list.isEmpty()) return null;
 				mDriver = list.get(0);
 			}
@@ -288,7 +288,7 @@ public class Cpu extends ActiveElement {
 		public int getTransitionLatency() {
 			if (mTransitionLatency == 0) {
 				List<String> list = ShellHelper.cat(
-					mRoot.getAbsolutePath() + "/cpufreq/cpuinfo_transition_latency");
+					mRoot.getAbsolutePath() + TRANSITION_LATENCY);
 				if (list == null || list.isEmpty()) return 0;
 				int value = 0;
 				try { value = Integer.valueOf(list.get(0)); }
@@ -305,7 +305,7 @@ public class Cpu extends ActiveElement {
 		
 		public void updateTotalTransitions() {
 			List<String> list = ShellHelper.cat(
-					mRoot.getAbsolutePath() + "/cpufreq/stats/total_trans");
+					mRoot.getAbsolutePath() + TRANSITIONS);
 			if (list == null || list.isEmpty()) return;
 			int value = 0;
 			try { value = Integer.valueOf(list.get(0)); }
@@ -325,7 +325,7 @@ public class Cpu extends ActiveElement {
 		
 		public void updateTimeInFrequency() {
 			List<String> list = ShellHelper.cat(
-					mRoot.getAbsolutePath() + "/cpufreq/stats/time_in_state");
+					mRoot.getAbsolutePath() + TIME_IN_FREQUENCY);
 			if (list == null || list.isEmpty()) return;
 			int len = list.size();
 			int[][] times = new int[len][2];
@@ -390,67 +390,12 @@ public class Cpu extends ActiveElement {
 			}
 			return 0;
 		}
-
-		@Override
-		public LinkedHashMap<String, String> getContents() {
-			LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-			LinkedHashMap<String, String> subcontents;
-			
-			contents.put("ID", String.valueOf(getId()));
-			contents.put("Root", getRoot().getAbsolutePath());
-			contents.put("Frequency (MHz)", String.valueOf(getFrequency()));
-			contents.put("MinFrequency (MHz)", String.valueOf(getMinFrequency()));
-			contents.put("MaxFrequency (MHz)", String.valueOf(getMaxFrequency()));
-			
-			int[] freqs = getAvailableFrequencies();
-			if (freqs != null) {
-				for (int i = 0; i < freqs.length; ++i) {
-					contents.put("AvailableFrequency " + i + " (MHz)", 
-						String.valueOf(freqs[i]));
-				}
-			}
-			
-			String[] govs = getAvailableGovernors();
-			if (govs != null) {
-				for (int i = 0; i < govs.length; ++i) {
-					contents.put("AvailableGovernor " + i, govs[i]);
-				}
-			}
-			
-			contents.put("Governor", getGovernor());
-			contents.put("Driver", getDriver());
-			contents.put("TransitionLatency (ns)", String.valueOf(getTransitionLatency()));
-			contents.put("TotalTransitions", String.valueOf(getTotalTransitions()));
-			contents.put("TimeInTransitions (s)", String.valueOf(getTimeInTransitions()));
-			contents.put("TimeInTransitions (s)", String.valueOf(getTimeInTransitions()));
-			
-			int[][] times = getTimeInFrequency();
-			if (times != null) {
-				for (int i = 0; i < times.length; ++i) {
-					contents.put("TimeInFrequency " + times[i][0] + "MHz (Jiffies (10ms))", 
-							String.valueOf(times[i][1]));					
-				}
-			}
-			
-			Map<Integer, Float> percents = getPercentInFrequency();
-			if (percents != null && percents.size() > 0) {
-				for (int freq : percents.keySet()) {
-					contents.put("PercentInFrequency " + freq + "MHz", 
-							String.valueOf(percents.get(freq)));
-				}
-			}
-			
-			subcontents = getCpuStat().getContents();
-			for (Entry<String, String> e : subcontents.entrySet()) {
-				contents.put("CpuStat " + e.getKey(), e.getValue());
-			}
-			
-			return contents;
-		}
 	}
 	
-	public class CpuStat implements ContentsMapper {
+	public class CpuStat {
 		private final String LOG_TAG = CpuStat.class.getSimpleName();
+
+        private final String PREFIX = "cpu";
 		
 		public final int OVERALL_ID = -1;
 		
@@ -499,7 +444,7 @@ public class Cpu extends ActiveElement {
 				return false;
 			}
 			
-			String value = "cpu";			
+			String value = PREFIX;
 			if (mId != OVERALL_ID) value += mId;
 			
 			if (!parts[0].equals(value)) {
@@ -814,104 +759,19 @@ public class Cpu extends ActiveElement {
 				+ (mIdle - mIdlePrevious) + (mIoWait - mIoWaitPrevious)
 				+ (mIntr - mIntrPrevious) + (mSoftIrq - mSoftIrqPrevious);
 		}
-
-		@Override
-		public LinkedHashMap<String, String> getContents() {
-			LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-			
-			contents.put("ID", String.valueOf(getId()));
-			contents.put("Timestamp", String.valueOf(getTimestamp()));
-			contents.put("TimestampPrevious", String.valueOf(getTimestampPrevious()));
-			contents.put("TimestampDifference", String.valueOf(getTimestampDifference()));
-			contents.put("User", String.valueOf(getUser()));
-			contents.put("UserPrevious", String.valueOf(getUserPrevious()));
-			contents.put("UserDifference", String.valueOf(getUserDifference()));
-			contents.put("UserPercent", String.valueOf(getUserPercent()));
-			contents.put("Nice", String.valueOf(getNice()));
-			contents.put("NicePrevious", String.valueOf(getNicePrevious()));
-			contents.put("NiceDifference", String.valueOf(getNiceDifference()));
-			contents.put("NicePercent", String.valueOf(getNicePercent()));
-			contents.put("System", String.valueOf(getSystem()));
-			contents.put("SystemPrevious", String.valueOf(getSystemPrevious()));
-			contents.put("SystemDifference", String.valueOf(getSystemDifference()));
-			contents.put("SystemPercent", String.valueOf(getSystemPercent()));
-			contents.put("Idle", String.valueOf(getIdle()));
-			contents.put("IdlePrevious", String.valueOf(getIdlePrevious()));
-			contents.put("IdleDifference", String.valueOf(getIdleDifference()));
-			contents.put("IdlePercent", String.valueOf(getIdlePercent()));
-			contents.put("IoWait", String.valueOf(getIoWait()));
-			contents.put("IoWaitPrevious", String.valueOf(getIoWaitPrevious()));
-			contents.put("IoWaitDifference", String.valueOf(getIoWaitDifference()));
-			contents.put("IoWaitPercent", String.valueOf(getIoWaitPercent()));
-			contents.put("Intr", String.valueOf(getIntr()));
-			contents.put("IntrPrevious", String.valueOf(getIntrPrevious()));
-			contents.put("IntrDifference", String.valueOf(getIntrDifference()));
-			contents.put("IntrPercent", String.valueOf(getIntrPercent()));
-			contents.put("SoftIrq", String.valueOf(getSoftIrq()));
-			contents.put("SoftIrqPrevious", String.valueOf(getSoftIrqPrevious()));
-			contents.put("SoftIrqDifference", String.valueOf(getSoftIrqDifference()));
-			contents.put("SoftIrqPercent", String.valueOf(getSoftIrqPercent()));
-			contents.put("UserTotal", String.valueOf(getUserTotal()));
-			contents.put("UserTotalPrevious", String.valueOf(getUserTotalPrevious()));
-			contents.put("UserTotalDifference", String.valueOf(getUserTotalDifference()));
-			contents.put("UserTotalPercent", String.valueOf(getUserTotalPercent()));
-			contents.put("SystemTotal", String.valueOf(getSystemTotal()));
-			contents.put("SystemTotalPrevious", String.valueOf(getSystemTotalPrevious()));
-			contents.put("SystemTotalDifference", String.valueOf(getSystemTotalDifference()));
-			contents.put("SystemTotalPercent", String.valueOf(getSystemTotalPercent()));
-			contents.put("IdleTotal", String.valueOf(getIdleTotal()));
-			contents.put("IdleTotalPrevious", String.valueOf(getIdleTotalPrevious()));
-			contents.put("IdleTotalDifference", String.valueOf(getIdleTotalDifference()));
-			contents.put("IdleTotalPercent", String.valueOf(getIdleTotalPercent()));
-			contents.put("Total", String.valueOf(getTotal()));
-			contents.put("TotalPrevious", String.valueOf(getTotalPrevious()));
-			contents.put("TotalDifference", String.valueOf(getTotalDifference()));
-			contents.put("TotalPercent", String.valueOf(getTotalPercent()));
-			
-			return contents; 
-		}
 	}
 
-
 	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = super.getContents();
-		LinkedHashMap<String, String> subcontents;
-		
-		for (int i = 0; i < mCpuinfo.size(); ++i) {
-			contents.put("CPU Info " + i, mCpuinfo.get(i));
-		}
-		
-		subcontents = mCpuStat.getContents();
-		for (String s : subcontents.keySet()) {
-			contents.put("Overall CpuStat " + s, subcontents.get(s));
-		}
-		
-		int i = 0;
-		for (LogicalCpu logicalCpu : mLogicalCpus) {
-			subcontents = logicalCpu.getContents();
-			for (String s : subcontents.keySet()) {				
-				contents.put("Logical CPU " + i + " " + s, subcontents.get(s));				
-			}
-			++i;
-		}
-		
-		return contents; 
-	}
-	
-	@Override
-	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.start(onlyIfCallbackSet)) return false;
+	public void start() {
+		if (isActive()) return;
 		mUpdateTask.start();
-		return setListening(true);
+		super.start();
 	}
 	
 	@Override
-	public boolean stop() {
-		if (!super.stop()) return false;
+	public void stop() {
+		if (!isActive()) return;
 		mUpdateTask.stop();
-		return !setListening(false);
+		super.stop();
 	}
-	
-	
 }
