@@ -1,18 +1,12 @@
 package com.deviceinfoapp.controller;
 
 import android.content.Context;
-import android.content.Intent;
 
-import com.deviceinfoapp.element.ActiveElement;
-import com.deviceinfoapp.element.Battery;
 import com.deviceinfoapp.element.Cpu;
 import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item2;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Jake on 7/18/13.
@@ -20,7 +14,7 @@ import java.util.Map;
 public class CpuController extends ActiveElementController implements Cpu.Callbacks {
 
     public interface Callbacks extends ActiveElementController.Callbacks {
-        void onUpdated(int numCpuStatsUpdated);
+        void onCpuUpdated(int numCpuStatsUpdated);
     }
 
     public CpuController(Context context, CpuController.Callbacks callbacks) {
@@ -176,6 +170,6 @@ public class CpuController extends ActiveElementController implements Cpu.Callba
 
     @Override
     public void onUpdated(int numCpuStatsUpdated) {
-        ((Callbacks) mCallbacks).onUpdated(numCpuStatsUpdated);
+        ((Callbacks) mCallbacks).onCpuUpdated(numCpuStatsUpdated);
     }
 }

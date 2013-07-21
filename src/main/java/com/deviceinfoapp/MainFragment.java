@@ -1,8 +1,23 @@
 package com.deviceinfoapp;
 
+import android.bluetooth.BluetoothProfile;
+import android.content.Context;
+import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.location.Address;
+import android.location.Location;
+import android.net.NetworkInfo;
+import android.net.wifi.ScanResult;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.telephony.CellLocation;
+import android.telephony.ServiceState;
+import android.telephony.SignalStrength;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,13 +27,53 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import com.deviceinfoapp.controller.AbsElementController;
+import com.deviceinfoapp.controller.ActiveElementController;
+import com.deviceinfoapp.controller.AudioController;
+import com.deviceinfoapp.controller.BatteryController;
+import com.deviceinfoapp.controller.BluetoothController;
+import com.deviceinfoapp.controller.CameraController;
+import com.deviceinfoapp.controller.CellularController;
+import com.deviceinfoapp.controller.CpuController;
+import com.deviceinfoapp.controller.DisplayController;
+import com.deviceinfoapp.controller.FeaturesController;
+import com.deviceinfoapp.controller.GraphicsController;
+import com.deviceinfoapp.controller.IdentifiersController;
+import com.deviceinfoapp.controller.KeysController;
+import com.deviceinfoapp.controller.LocationController;
+import com.deviceinfoapp.controller.NetworkController;
+import com.deviceinfoapp.controller.PlatformController;
+import com.deviceinfoapp.controller.PropertiesController;
+import com.deviceinfoapp.controller.RamController;
+import com.deviceinfoapp.controller.SensorsController;
+import com.deviceinfoapp.controller.StorageController;
+import com.deviceinfoapp.controller.UptimeController;
+import com.deviceinfoapp.controller.WifiController;
 import com.deviceinfoapp.data.Elements;
-import com.deviceinfoapp.element.ActiveElement;
-import com.deviceinfoapp.element.UnavailableFeatureException;
 import com.deviceinfoapp.viewable.Item;
 import com.deviceinfoapp.viewable.ItemExpandableListAdapter;
 
-public class MainFragment extends Fragment implements ActiveElementController.Callbacks {
+import java.util.LinkedHashMap;
+import java.util.List;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
+public class MainFragment
+        extends Fragment
+        implements
+            ActiveElementController.Callbacks,
+            BatteryController.Callbacks,
+            BluetoothController.Callbacks,
+            CellularController.Callbacks,
+            CpuController.Callbacks,
+            GraphicsController.Callbacks,
+            LocationController.Callbacks,
+            RamController.Callbacks,
+            SensorsController.Callbacks,
+            UptimeController.Callbacks,
+            WifiController.Callbacks
+        {
 
     public static final String ARG_ITEM_ID = "item_id";
 
@@ -76,53 +131,76 @@ public class MainFragment extends Fragment implements ActiveElementController.Ca
 
             switch (mItem) {
                 case Elements.OVERVIEW: break;
-                case Elements.PROCESSORS: break;
-                case Elements.RAM: break;
-                case Elements.STORAGE: break;
-                case Elements.DISPLAY: break;
-                case Elements.CAMERAS: break;
-                case Elements.BATTERY:
-                    mController = new BatteryController(getActivity(), new BatteryController.Callbacks() {
-
-                    });
-                    mPlayImmediately = true;
+                case Elements.PROCESSORS:
+                    mController = new CpuController(getActivity(), this);
                     break;
-                case Elements.SENSORS: break;
+                case Elements.RAM:
+                    mController = new RamController(getActivity(), this);
+                    break;
+                case Elements.STORAGE:
+                    mController = new StorageController(getActivity());
+                    break;
+                case Elements.DISPLAY:
+                    mController = new DisplayController(getActivity());
+                    break;
+                case Elements.CAMERAS:
+                    mController = new CameraController(getActivity());
+                    break;
+                case Elements.BATTERY:
+                    mController = new BatteryController(getActivity(), this);
+                    break;
+                case Elements.SENSORS:
+                    mController = new SensorsController(getActivity(), this);
+                    break;
                 case Elements.AUDIO:
                     mController = new AudioController(getActivity());
                     break;
-                case Elements.GRAPHICS: break;
-                case Elements.LOCATION: break;
-                case Elements.NETWORK: break;
-                case Elements.CELLULAR: break;
-                case Elements.WIFI: break;
-                case Elements.BLUETOOTH:
-                    try {
-                        mController = new BluetoothController(getActivity(), new BluetoothController.Callbacks() {
-
-                        });
-                        mPlayImmediately = true;
-                    } catch (UnavailableFeatureException e) {
-                        e.printStackTrace();
-                    }
+                case Elements.GRAPHICS:
+                    mController = new GraphicsController(getActivity(), this);
                     break;
-                case Elements.UPTIME: break;
-                case Elements.PLATFORM: break;
-                case Elements.IDENTIFIERS: break;
-                case Elements.FEATURES: break;
-                case Elements.PROPERTIES: break;
-                case Elements.KEYS: break;
+                case Elements.LOCATION:
+                    mController = new LocationController(getActivity(), this);
+                    break;
+                case Elements.NETWORK:
+                    mController = new NetworkController(getActivity());
+                    break;
+                case Elements.CELLULAR:
+                    mController = new CellularController(getActivity(), this);
+                    break;
+                case Elements.WIFI:
+                    mController = new WifiController(getActivity(), this);
+                    break;
+                case Elements.BLUETOOTH:
+                    mController = new BluetoothController(getActivity(), this);
+                    break;
+                case Elements.UPTIME:
+                    mController = new UptimeController(getActivity(), this);
+                    break;
+                case Elements.PLATFORM:
+                    mController = new PlatformController(getActivity());
+                    break;
+                case Elements.IDENTIFIERS:
+                    mController = new IdentifiersController(getActivity());
+                    break;
+                case Elements.FEATURES:
+                    mController = new FeaturesController(getActivity());
+                    break;
+                case Elements.PROPERTIES:
+                    mController = new PropertiesController(getActivity());
+                    break;
+                case Elements.KEYS:
+                    mController = new KeysController(getActivity());
+                    break;
             }
 
             if (mController != null) {
                 if (mController instanceof ActiveElementController) {
                     mIsActive = true;
-                    ((ActiveElement) mController).setCallbacks(this);
-
-                    mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
-                    mListView.setAdapter(mAdapter);
-                    mListView.expandGroup(0);
+                    mPlayImmediately = false;
                 }
+                mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
+                mListView.setAdapter(mAdapter);
+                mListView.expandGroup(0);
             }
         }
 
@@ -186,8 +264,8 @@ public class MainFragment extends Fragment implements ActiveElementController.Ca
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         if (mIsActive) {
             stop();
             mHandler.removeCallbacksAndMessages(null);
@@ -278,4 +356,77 @@ public class MainFragment extends Fragment implements ActiveElementController.Ca
 
         }
     }
+
+
+    //
+    // BatteryController
+    //
+    @Override public void onReceive(Context context, Intent intent) {}
+
+    //
+    // BluetoothController
+    //
+    @Override public void onServiceConnected(int profile, BluetoothProfile proxy) {}
+    @Override public void onServiceDisconnected(int profile) {}
+
+    //
+    // CellularController
+    //
+    @Override public void onCallForwardingIndicatorChanged(boolean cfi) {}
+    @Override public void onCallStateChanged(int state, String incomingNumber) {}
+    @Override public void onCellLocationChanged(CellLocation location) {}
+    @Override public void onDataActivity(int direction) {}
+    @Override public void onDataConnectionStateChanged(int state, int networkType) {}
+    @Override public void onMessageWaitingIndicatorChanged(boolean mwi) {}
+    @Override public void onServiceStateChanged(ServiceState serviceState) {}
+    @Override public void onSignalStrengthsChanged(SignalStrength signalStrength) {}
+
+    //
+    // CpuController
+    //
+    @Override public void onCpuUpdated(int numCpuStatsUpdated) {}
+
+    //
+    // GraphicsController
+    //
+    @Override public void onSurfaceCreated(GL10 gl, EGLConfig config) {}
+    @Override public void onSurfaceChanged(GL10 gl, int width, int height) {}
+    @Override public void onDrawFrame(GL10 gl) {}
+
+    //
+    // LocationController
+    //
+    @Override public void onLocationChanged(Location location) {}
+    @Override public void onProviderDisabled(String provider) {}
+    @Override public void onProviderEnabled(String provider) {}
+    @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
+    @Override public void onAddressChanged(Address address, Location location) {}
+    @Override public void onGpsStatusChanged(int event) {}
+    @Override public void onNmeaReceived(long timestamp, String nmea) {}
+
+    //
+    // RamController
+    //
+    @Override public void onRamUpdated(LinkedHashMap<String, String> meminfo) {}
+
+    //
+    // SensorController
+    //
+    @Override public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    @Override public void onSensorChanged(SensorEvent event) {}
+
+    //
+    // UptimeController
+    //
+    @Override public void onUptimeUpdated(float uptimeTotal, float uptimeAsleep) {}
+
+    //
+    // WifiController
+    //
+    @Override public void onScanCompleted(List<ScanResult> results) {}
+    @Override public void onNetworkIdsChanged(List<WifiConfiguration> configurations) {}
+    @Override public void onNetworkStateChanged(NetworkInfo networkInfo, String bssid, WifiInfo wifiInfo) {}
+    @Override public void onRssiChanged(int rssi) {}
+    @Override public void onSupplicantConnectionChanged(boolean connected) {}
+    @Override public void onSupplicantStateChanged(SupplicantState state, int error) {}
 }

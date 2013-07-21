@@ -624,11 +624,11 @@ public class SensorsController extends ActiveElementController implements Sensor
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        ((Callbacks) mCallbacks).onAccuracyChanged(sensor, accuracy);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-
+        ((Callbacks) mCallbacks).onSensorChanged(event);
     }
 }

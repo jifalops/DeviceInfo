@@ -17,7 +17,7 @@ import java.util.Map;
 public class RamController extends ActiveElementController implements Ram.Callbacks {
 
     public interface Callbacks extends ActiveElementController.Callbacks {
-        void onUpdated(LinkedHashMap<String, String> meminfo);
+        void onRamUpdated(LinkedHashMap<String, String> meminfo);
     }
 
     public RamController(Context context, RamController.Callbacks callbacks) {
@@ -42,6 +42,6 @@ public class RamController extends ActiveElementController implements Ram.Callba
 
     @Override
     public void onUpdated(LinkedHashMap<String, String> meminfo) {
-        ((Callbacks) mCallbacks).onUpdated(meminfo);
+        ((Callbacks) mCallbacks).onRamUpdated(meminfo);
     }
 }
