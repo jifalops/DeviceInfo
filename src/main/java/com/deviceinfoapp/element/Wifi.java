@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.DhcpInfo;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.SupplicantState;
@@ -18,18 +17,21 @@ import android.net.wifi.WifiConfiguration.Status;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Parcelable;
-import android.text.TextUtils;
 
 import com.deviceinfoapp.R;
-import com.deviceinfoapp.util.Convert;
 
 import java.util.BitSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Wifi extends ActiveElement {
+
+    private final int ACTIVE_ACTIONS = 6;
+    public final int
+            ACTION_SCAN = 0,            ACTION_NETWORK_ID = 1,
+            ACTION_NETWORK_STATE = 2,   ACTION_RSSI = 3,
+            ACTION_SUP_CONN = 4,        ACTION_SUP_STATE = 5;
 	
-	public interface Callback extends Callbacks {
+	public interface Callbacks extends ActiveElement.Callbacks {
 		void onScanCompleted(List<ScanResult> results);
 		void onNetworkIdsChanged(List<WifiConfiguration> configurations);
 		void onNetworkStateChanged(NetworkInfo networkInfo, String bssid, WifiInfo wifiInfo);
@@ -37,7 +39,8 @@ public class Wifi extends ActiveElement {
 		void onSupplicantConnectionChanged(boolean connected);
 		void onSupplicantStateChanged(SupplicantState state, int error);
 	}
-	
+
+    // TODO is this needed?
 	private interface StringsCallback {
 		String getString(int value);
 	}
@@ -93,13 +96,12 @@ public class Wifi extends ActiveElement {
 	public final String CONFIG_STAUS_ENABLED;
 	
 	
-	private final WifiManager mWifiManager;
-	private final WifiReceiver mReceiver;
-	private final Network mNetwork;
-	private final Context mContext;
+	private WifiManager mWifiManager;
+	private WifiReceiver mReceiver;
+	private Network mNetwork;
 	
-	public Wifi(Context context) {	
-		super(context);
+	public Wifi(Context context, Wifi.Callbacks callbacks) {
+		super(context, callbacks);
 		ERROR_AUTHENTICATING = context.getString(R.string.wifi_error_authenticating);
 		MODE_FULL = context.getString(R.string.wifi_mode_full);
 		MODE_FULL_HIGH_PERF = context.getString(R.string.wifi_mode_full_high_perf);
@@ -143,13 +145,14 @@ public class Wifi extends ActiveElement {
 		CONFIG_STAUS_ENABLED = context.getString(R.string.wifi_status_enabled);
 		
 		mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-		mReceiver = new WifiReceiver(this);		
+		mReceiver = new WifiReceiver();
 		mNetwork = new Network(context);
-		mContext = context;
+
+        setActiveActionCount(ACTIVE_ACTIONS);
 	}
 	
 	// TODO where can this be used?
-	public String getWifiModeString(int mode) {
+	public String getWifiMode(int mode) {
 		switch (mode) {
 		case WifiManager.WIFI_MODE_FULL: return MODE_FULL;
 		case WifiManager.WIFI_MODE_FULL_HIGH_PERF: return MODE_FULL_HIGH_PERF;
@@ -158,7 +161,7 @@ public class Wifi extends ActiveElement {
 		}		
 	}
 	
-	public String getWifiStateString(int state) {
+	public String getWifiState(int state) {
 		switch (state) {
 		case WifiManager.WIFI_STATE_DISABLED: return STATE_DISABLED;
 		case WifiManager.WIFI_STATE_DISABLING: return STATE_DISABLING;
@@ -169,7 +172,7 @@ public class Wifi extends ActiveElement {
 		}		
 	}
 	
-	public String getSupplicantStateString(SupplicantState state) {
+	public String getSupplicantState(SupplicantState state) {
 		switch (state) {
 		case ASSOCIATED: return SUPPLICANT_ASSOCIATED;		
 		case ASSOCIATING: return SUPPLICANT_ASSOCIATING;
@@ -188,7 +191,7 @@ public class Wifi extends ActiveElement {
 		}		
 	}
 	
-	public String getAuthAlgorithmString(int value) {
+	public String getAuthAlgorithm(int value) {
 		switch (value) {
 		case AuthAlgorithm.LEAP: return CONFIG_AUTHALGORITHM_LEAP;
 		case AuthAlgorithm.OPEN: return CONFIG_AUTHALGORITHM_OPEN;
@@ -197,7 +200,7 @@ public class Wifi extends ActiveElement {
 		}
 	}
 	
-	public String getGroupCipherString(int value) {
+	public String getGroupCipher(int value) {
 		switch (value) {
 		case GroupCipher.CCMP: return CONFIG_GROUPCIPHER_CCMP;
 		case GroupCipher.TKIP: return CONFIG_GROUPCIPHER_TKIP;
@@ -207,7 +210,7 @@ public class Wifi extends ActiveElement {
 		}
 	}
 	
-	public String getKeyManagementString(int value) {
+	public String getKeyManagement(int value) {
 		switch (value) {
 		case KeyMgmt.IEEE8021X: return CONFIG_KEYMGMT_8021X;
 		case KeyMgmt.NONE: return CONFIG_KEYMGMT_NONE;
@@ -217,7 +220,7 @@ public class Wifi extends ActiveElement {
 		}
 	}
 	
-	public String getPairwiseCipherString(int value) {
+	public String getPairwiseCipher(int value) {
 		switch (value) {
 		case PairwiseCipher.CCMP: return CONFIG_PAIRWISECIPHER_CCMP;
 		case PairwiseCipher.NONE: return CONFIG_PAIRWISECIPHER_NONE;
@@ -226,7 +229,7 @@ public class Wifi extends ActiveElement {
 		}
 	}
 	
-	public String getProtocolString(int value) {
+	public String getProtocol(int value) {
 		switch (value) {
 		case Protocol.RSN: return CONFIG_PROTOCOL_RSN;
 		case Protocol.WPA: return CONFIG_PROTOCOL_WPA;
@@ -234,7 +237,7 @@ public class Wifi extends ActiveElement {
 		}
 	}
 	
-	public String getStatusString(int value) {
+	public String getStatus(int value) {
 		switch (value) {
 		case Status.CURRENT: return CONFIG_STAUS_CURRENT;
 		case Status.DISABLED: return CONFIG_STAUS_DISABLED;
@@ -243,47 +246,47 @@ public class Wifi extends ActiveElement {
 		}
 	}
 	
-	public String[] getAuthAlgorithmStrings(BitSet bits) {
+	public String[] getAuthAlgorithms(BitSet bits) {
 		return getStrings(bits, new StringsCallback() {			
 			@Override
 			public String getString(int value) {
-				return getAuthAlgorithmString(value);
+				return getAuthAlgorithm(value);
 			}
 		});
 	}
 	
-	public String[] getGroupCipherStrings(BitSet bits) {
+	public String[] getGroupCiphers(BitSet bits) {
 		return getStrings(bits, new StringsCallback() {			
 			@Override
 			public String getString(int value) {
-				return getGroupCipherString(value);
+				return getGroupCipher(value);
 			}
 		});
 	}
 	
-	public String[] getKeyManagementStrings(BitSet bits) {
+	public String[] getKeyManagements(BitSet bits) {
 		return getStrings(bits, new StringsCallback() {			
 			@Override
 			public String getString(int value) {
-				return getKeyManagementString(value);
+				return getKeyManagement(value);
 			}
 		});
 	}
 	
-	public String[] getPairwiseCipherStrings(BitSet bits) {
+	public String[] getPairwiseCiphers(BitSet bits) {
 		return getStrings(bits, new StringsCallback() {			
 			@Override
 			public String getString(int value) {
-				return getPairwiseCipherString(value);
+				return getPairwiseCipher(value);
 			}
 		});
 	}
 	
-	public String[] getProtocolStrings(BitSet bits) {
+	public String[] getProtocols(BitSet bits) {
 		return getStrings(bits, new StringsCallback() {			
 			@Override
 			public String getString(int value) {
-				return getProtocolString(value);
+				return getProtocol(value);
 			}
 		});
 	}
@@ -331,126 +334,23 @@ public class Wifi extends ActiveElement {
 	
 	
 	// TODO use system properties for ip, dns, etc as a backup
-	
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = super.getContents();
-		
-		// Wifi
-		contents.put("State", getWifiStateString(mWifiManager.getWifiState()));
-		
-		// WifiManager
-		contents.put("IsEnabled", String.valueOf(mWifiManager.isWifiEnabled()));
-		
-//		Requires CHANGE_WIFI_STATE permission
-//		contents.put("Can Ping Supplicant", String.valueOf(mWifiManager.pingSupplicant()));
-		
-		// WifiInfo
-		WifiInfo winfo = mWifiManager.getConnectionInfo();
-		if (winfo != null) {
-			contents.put("BSSID", winfo.getBSSID());
-			contents.put("SSID", winfo.getSSID());
-			contents.put("Is SSID Hidden", String.valueOf(winfo.getHiddenSSID()));
-			contents.put("IP", Convert.Ip4.fromInt(winfo.getIpAddress()));
-			contents.put("Link Speed (Mbps)", String.valueOf(winfo.getLinkSpeed()));
-			contents.put("MAC Address", winfo.getMacAddress());
-			contents.put("Network ID", String.valueOf(winfo.getNetworkId()));
-			contents.put("RSSI (asu)", String.valueOf(winfo.getRssi()));
-			contents.put("Supplicant State", getSupplicantStateString(winfo.getSupplicantState()));
-			contents.put("Detailed State", mNetwork.getStateString(
-					WifiInfo.getDetailedStateOf(winfo.getSupplicantState())));			
-		}
-		else contents.put("WifiInfo", null);
-		
-		// DhcpInfo
-		DhcpInfo dinfo = mWifiManager.getDhcpInfo();
-		if (dinfo != null) {
-			contents.put("DHCP DNS1", Convert.Ip4.fromInt(dinfo.dns1));
-			contents.put("DHCP DNS2", Convert.Ip4.fromInt(dinfo.dns2));
-			contents.put("DHCP Gateway", Convert.Ip4.fromInt(dinfo.gateway));
-			contents.put("DHCP IP", Convert.Ip4.fromInt(dinfo.ipAddress));
-			contents.put("DHCP Lease Duration (s?)", String.valueOf(dinfo.leaseDuration));
-			contents.put("DHCP Netmask", Convert.Ip4.fromInt(dinfo.netmask));
-			contents.put("DHCP Server", Convert.Ip4.fromInt(dinfo.serverAddress));
-		}
-		else contents.put("DhcpInfo", null);
-		
-		// ScanResults
-		List<ScanResult> scans = mWifiManager.getScanResults();
-		if (scans != null) {
-			for (int i = 0; i < scans.size(); ++i) {
-				contents.put("ScanResult " + i + " BSSID", scans.get(i).BSSID);
-				contents.put("ScanResult " + i + " SSID", scans.get(i).SSID);
-				contents.put("ScanResult " + i + " capabilities", scans.get(i).capabilities);
-				contents.put("ScanResult " + i + " frequency (MHz)", String.valueOf(scans.get(i).frequency));
-				contents.put("ScanResult " + i + " level (dBm)", String.valueOf(scans.get(i).level));
-			}
-		}
-		else contents.put("ScanResults", null);
-		
-		// WifiConfigurations
-		List<WifiConfiguration> wifis = mWifiManager.getConfiguredNetworks();
-		String[] strings;
-		if (wifis != null) {
-			for (int i = 0; i < wifis.size(); ++i) {
-				contents.put("WifiConfiguration " + i + " BSSID", wifis.get(i).BSSID);
-				contents.put("WifiConfiguration " + i + " SSID", wifis.get(i).SSID);
-				contents.put("WifiConfiguration " + i + " Is Hidden SSID", String.valueOf(wifis.get(i).hiddenSSID));
-				contents.put("WifiConfiguration " + i + " Network ID", String.valueOf(wifis.get(i).networkId));
-				contents.put("WifiConfiguration " + i + " Has PreSharedKey", 
-						String.valueOf(hasPreSharedKey(wifis.get(i).preSharedKey)));
-				contents.put("WifiConfiguration " + i + " Priority", String.valueOf(wifis.get(i).priority));
-				contents.put("WifiConfiguration " + i + " Status", getStatusString(wifis.get(i).status));
-				contents.put("WifiConfiguration " + i + " Num WEP Keys", String.valueOf(getNumWepKeys(wifis.get(i).wepKeys)));
-				contents.put("WifiConfiguration " + i + " Default WEP Key index", String.valueOf(wifis.get(i).wepTxKeyIndex));
-				
-				strings = getAuthAlgorithmStrings(wifis.get(i).allowedAuthAlgorithms);
-				if (strings != null) contents.put("WifiConfiguration " + i + " Allowed AuthAlgorithms",	
-						TextUtils.join(", ", strings));
-				else contents.put("WifiConfiguration " + i + " Allowed AuthAlgorithms", null);
-				
-				strings = getGroupCipherStrings(wifis.get(i).allowedGroupCiphers);
-				if (strings != null) contents.put("WifiConfiguration " + i + " Allowed GroupCiphers",	
-						TextUtils.join(", ", strings));
-				else contents.put("WifiConfiguration " + i + " Allowed GroupCiphers", null);
 
-				strings = getKeyManagementStrings(wifis.get(i).allowedKeyManagement);
-				if (strings != null) contents.put("WifiConfiguration " + i + " Allowed KeyManagement",	
-						TextUtils.join(", ", strings));
-				else contents.put("WifiConfiguration " + i + " Allowed KeyManagement", null);
-				
-				strings = getPairwiseCipherStrings(wifis.get(i).allowedPairwiseCiphers);
-				if (strings != null) contents.put("WifiConfiguration " + i + " Allowed PairwiseCiphers",	
-						TextUtils.join(", ", strings));
-				else contents.put("WifiConfiguration " + i + " Allowed PairwiseCiphers", null);
-				
-				strings = getProtocolStrings(wifis.get(i).allowedProtocols);
-				if (strings != null) contents.put("WifiConfiguration " + i + " Allowed Protocols",	
-						TextUtils.join(", ", strings));
-				else contents.put("WifiConfiguration " + i + " Allowed Protocols", null);
-			}
-		}
-		else contents.put("WifiConfigurations", null);
-		
-		return contents;
-	}
 
-	public static class WifiReceiver extends BroadcastReceiver {
-		private final Wifi mWifi;
-		
-		public WifiReceiver(Wifi wifi) {
-			mWifi = wifi;
-		}
-		
+	public class WifiReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (mWifi == null || mWifi.getCallbacks() == null || intent == null) return;
+			if (intent == null) return;
 			
 			// TODO use the intent extras to return values to the callback
 			if (intent.getAction().equals(WifiManager.NETWORK_IDS_CHANGED_ACTION)) {
-				((Callback) mWifi.getCallbacks()).onNetworkIdsChanged(mWifi.getWifiManager().getConfiguredNetworks());
+                if (!isActionAllowed(ACTION_NETWORK_ID)) return;
+
+                setActionTime(ACTION_NETWORK_ID);
+				((Callbacks) mCallbacks).onNetworkIdsChanged(getWifiManager().getConfiguredNetworks());
 			}
-			else if (intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {		
+			else if (intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                if (!isActionAllowed(ACTION_NETWORK_STATE)) return;
+
 				NetworkInfo ni = null;
 				String bssid = null;
 				WifiInfo wi = null;
@@ -463,33 +363,46 @@ public class Wifi extends ActiveElement {
 						if (p != null) wi = (WifiInfo) p;
 					}
 				}
-				
-				((Callback) mWifi.getCallbacks()).onNetworkStateChanged(ni, bssid, wi);
+
+                setActionTime(ACTION_NETWORK_STATE);
+				((Callbacks) mCallbacks).onNetworkStateChanged(ni, bssid, wi);
 			}
-			else if (intent.getAction().equals(WifiManager.RSSI_CHANGED_ACTION)) {				
-				((Callback) mWifi.getCallbacks()).onRssiChanged(intent.getIntExtra(WifiManager.EXTRA_NEW_RSSI, 0));
+			else if (intent.getAction().equals(WifiManager.RSSI_CHANGED_ACTION)) {
+                if (!isActionAllowed(ACTION_RSSI)) return;
+
+                setActionTime(ACTION_RSSI);
+				((Callbacks) mCallbacks).onRssiChanged(intent.getIntExtra(WifiManager.EXTRA_NEW_RSSI, 0));
 			}
 			else if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-				((Callback) mWifi.getCallbacks()).onScanCompleted(mWifi.getWifiManager().getScanResults());
+                if (!isActionAllowed(ACTION_SCAN)) return;
+
+                setActionTime(ACTION_SCAN);
+				((Callbacks) mCallbacks).onScanCompleted(getWifiManager().getScanResults());
 			}
 			else if (intent.getAction().equals(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) {
-				((Callback) mWifi.getCallbacks()).onSupplicantConnectionChanged(
-						intent.getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false));								
+				if (!isActionAllowed(ACTION_SUP_CONN)) return;
+
+                setActionTime(ACTION_SUP_CONN);
+                ((Callbacks) mCallbacks).onSupplicantConnectionChanged(
+                        intent.getBooleanExtra(WifiManager.EXTRA_SUPPLICANT_CONNECTED, false));
 			}
 			else if (intent.getAction().equals(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)) {
+                if (!isActionAllowed(ACTION_SUP_STATE)) return;
+
 				SupplicantState ss = null;
 				Parcelable p = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
 				if (p != null) ss = (SupplicantState) p; 
-				
-				((Callback) mWifi.getCallbacks()).onSupplicantStateChanged(
-						ss, intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, 0));								
+
+                setActionTime(ACTION_SUP_STATE);
+				((Callbacks) mCallbacks).onSupplicantStateChanged(
+                        ss, intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, 0));
 			}
 		}
 	}
 
 	@Override
-	public boolean startListening(boolean onlyIfCallbackSet) {
-		if (!super.start(onlyIfCallbackSet) || mContext == null) return false;
+	public void start() {
+		if (isActive()) return;
 		mContext.registerReceiver(mReceiver, 
 				new IntentFilter(WifiManager.NETWORK_IDS_CHANGED_ACTION));
 		mContext.registerReceiver(mReceiver, 
@@ -502,13 +415,13 @@ public class Wifi extends ActiveElement {
 				new IntentFilter(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
 		mContext.registerReceiver(mReceiver, 
 				new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
-		return setListening(true);
+		super.start();
 	}
 
 	@Override
-	public boolean stop() {
-		if (!super.stop() || mContext == null) return false;
+	public void stop() {
+		if (!isActive()) return;
 		mContext.unregisterReceiver(mReceiver);
-		return !setListening(false);
+		super.stop();
 	}
 }

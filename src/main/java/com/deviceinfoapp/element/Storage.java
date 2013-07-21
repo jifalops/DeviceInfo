@@ -7,17 +7,23 @@ import android.util.Log;
 import com.deviceinfoapp.util.ShellHelper;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 
 public class Storage extends AbsElement {
 	private static final String LOG_TAG = Storage.class.getSimpleName();
+
+    private static final String
+            PROC_MOUNTS = "mounts",         PROC_PARTITIONS = "partitions",
+
+            MOUNT_SDCARDS = ".*sd[^/]*",    MOUNT_SYSTEM = "/system",
+            MOUNT_DATA = "/data",           MOUNT_CACHE = "/cache",
+            MOUNT_ROOT = "/";
 	
 	private List<Mount> mMounts;
 	private List<Partition> mPartitions;
 	
-	// TODO use singleton
+	// TODO use singleton?
 	
 	//TODO android.os.Environment
 	public Storage(Context context) {
@@ -29,14 +35,123 @@ public class Storage extends AbsElement {
 		if (!updatePartitions()) 
 			Log.e(LOG_TAG, "Error updating partitions.");		
 	}
+
+    /** Get the current mounts from /proc */
+    public boolean updateMounts() {
+        List<String> mounts = ShellHelper.getProc(PROC_MOUNTS);
+        if (mounts == null || mounts.isEmpty()) return false;
+        mMounts.clear();
+        for (String s : mounts) {
+            if (s == null || s.length() == 0) continue;
+            mMounts.add(new Mount(s));
+        }
+        return !mMounts.isEmpty();
+    }
+
+    private boolean updatePartitions() {
+        List<String> partitions = ShellHelper.getProc(PROC_PARTITIONS);
+        if (partitions == null || partitions.isEmpty()) return false;
+        mPartitions.clear();
+        boolean first = true;
+        for (String s : partitions) {
+            // Skip the column headers
+            if (first) {
+                first = false;
+                continue;
+            }
+            if (s == null || s.length() == 0) continue;
+            mPartitions.add(new Partition(s));
+        }
+        return !mPartitions.isEmpty();
+    }
+
+    public List<Mount> getMounts() {
+        return mMounts;
+    }
+
+    public Mount getMountByPath(String mountPoint) {
+        if (mountPoint == null || mountPoint.length() == 0) return null;
+        for (Mount m : mMounts) {
+            if (mountPoint.equals(m.getMountPoint())) {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    public List<Mount> findMountsByPath(String regex) {
+        if (regex == null || regex.length() == 0) return null;
+        List<Mount> matches = new ArrayList<Mount>();
+        for (Mount m : mMounts) {
+            if (m.getMountPoint().matches(regex)) {
+                matches.add(m);
+            }
+        }
+        return matches;
+    }
+
+    public List<Mount> getSdcardMounts() {
+        return findMountsByPath(MOUNT_SDCARDS);
+    }
+
+    public Mount getSystemMount() {
+        return getMountByPath(MOUNT_SYSTEM);
+    }
+
+    public Mount getDataMount() {
+        return getMountByPath(MOUNT_DATA);
+    }
+
+    public Mount getCacheMount() {
+        return getMountByPath(MOUNT_CACHE);
+    }
+
+    public Mount getRootMount() {
+        return getMountByPath(MOUNT_ROOT);
+    }
+
+    public List<Partition> getPartitions() {
+        return mPartitions;
+    }
+
+    public List<Partition> getAliasedPartitions() {
+        List<Partition> list = new ArrayList<Partition>();
+        for (Partition p : mPartitions) {
+            if (p.getAlias() != null) {
+                list.add(p);
+            }
+        }
+        return list;
+    }
+
+    public Partition getPartitionByAlias(String alias) {
+        if (alias == null || alias.length() == 0) return null;
+        for (Partition p : mPartitions) {
+            if (alias.equals(p.getAlias())) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public Partition getBootPartition() {
+        return getPartitionByAlias("boot");
+    }
+
+    public Partition getRecoveryPartition() {
+        return getPartitionByAlias("recovery");
+    }
 	
-	public class Partition implements ContentsMapper {
+	public static class Partition {
 		// TODO look up block size
 		/** It *seems* that the partition block sizes are 
 		 * (almost) always 1024. Frequently enough to count
 		 * on it for now =[
 		 */
 		public static final int BLOCK_SIZE = 1024;
+
+        private static final String PROC_DEVICES = "devices";
+
 		private int mMajor;
 		private int mMinor;
 		private int mBlocks;
@@ -76,7 +191,7 @@ public class Storage extends AbsElement {
 		}
 		
 		private String getDevice(int major) {
-			List<String> devices = ShellHelper.getProc("devices");
+			List<String> devices = ShellHelper.getProc(PROC_DEVICES);
 	        if (devices == null || devices.isEmpty()) return null;
 	        // return *last* match (to match in "Block devices:")
 	        String device = null;	   
@@ -124,26 +239,9 @@ public class Storage extends AbsElement {
 		public String getAlias() {
 			return mAlias;
 		}
-		
-		@Override
-		public LinkedHashMap<String, String> getContents() {
-			LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-			
-			contents.put("Alias", getAlias());
-			contents.put("Name", getName());
-			contents.put("Num Blocks", String.valueOf(getNumBlocks()));
-			contents.put("Block Size", String.valueOf(getBlockSize()));
-			contents.put("Total Size", String.valueOf(getTotalSize()));
-			contents.put("Device", getDevice());
-			contents.put("Device Major", String.valueOf(getDeviceMajor()));
-			contents.put("Device Minor", String.valueOf(getDeviceMinor()));
-			
-			return contents;
-		}
-		
 	}
 	
-	public class Mount implements ContentsMapper {
+	public static class Mount {
 		private static final int NO_STATFS = -1;
 		
 		private String mDevice;
@@ -250,177 +348,5 @@ public class Storage extends AbsElement {
 		public String getAttributesString() {
 			return mAttributesString;
 		}
-
-		@Override
-		public LinkedHashMap<String, String> getContents() {
-			LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-			
-			contents.put("Device", getDevice());
-			contents.put("MountPoint", getMountPoint());
-			contents.put("FileSystem", getFileSystem());
-			contents.put("Attributes", getAttributesString());
-			contents.put("BlockSize", String.valueOf(getBlockSize()));
-			contents.put("BlockCount", String.valueOf(getBlockCount()));
-			contents.put("TotalSize", String.valueOf(getTotalSize()));
-			contents.put("FreeSpace", String.valueOf(getFreeSpace()));
-			contents.put("AvailableSpace", String.valueOf(getAvailableSpace()));
-			
-			return contents;
-		}
-	}
-	
-	
-	/** Get the current mounts from /proc */
-	public boolean updateMounts() {
-        List<String> mounts = ShellHelper.getProc("mounts");
-        if (mounts == null || mounts.isEmpty()) return false;
-        mMounts.clear();
-        for (String s : mounts) {
-        	if (s == null || s.length() == 0) continue;
-        	mMounts.add(new Mount(s));
-        }
-        return !mMounts.isEmpty();
-    }
-	
-	private boolean updatePartitions() {
-        List<String> partitions = ShellHelper.getProc("partitions");
-        if (partitions == null || partitions.isEmpty()) return false;
-        mPartitions.clear();
-        boolean first = true;
-        for (String s : partitions) {
-        	// Skip the column headers
-        	if (first) {
-        		first = false;
-        		continue;
-        	}
-        	if (s == null || s.length() == 0) continue;
-        	mPartitions.add(new Partition(s));
-        }
-        return !mPartitions.isEmpty();
-    }
-	
-	public List<Mount> getMounts() {
-		return mMounts;
-	}
-	
-	public Mount getMountByPath(String mountPoint) {
-        if (mountPoint == null || mountPoint.length() == 0) return null;
-		for (Mount m : mMounts) {
-        	if (mountPoint.equals(m.getMountPoint())) {
-        		return m;
-        	}
-        }
-        return null;
-    }
-	
-	public List<Mount> findMountsByPath(String regex) {
-		if (regex == null || regex.length() == 0) return null;
-		List<Mount> matches = new ArrayList<Mount>();
-		for (Mount m : mMounts) {
-			if (m.getMountPoint().matches(regex)) {
-				matches.add(m);
-			}
-		}
-		return matches;
-	}
-	
-	public List<Mount> getSdcardMounts() {
-		return findMountsByPath(".*sd[^/]*");
-	}
-	
-	public Mount getSystemMount() {
-		return getMountByPath("/system");
-	}
-	
-	public Mount getDataMount() {
-		return getMountByPath("/data");
-	}
-	
-	public Mount getCacheMount() {
-		return getMountByPath("/cache");
-	}
-	
-	public Mount getRootMount() {
-		return getMountByPath("/");
-	}
-	
-	public List<Partition> getPartitions() {
-		return mPartitions;
-	}
-	
-	public List<Partition> getAliasedPartitions() {
-		List<Partition> list = new ArrayList<Partition>();
-		for (Partition p : mPartitions) {
-        	if (p.getAlias() != null) {
-        		list.add(p);
-        	}
-        }
-        return list;
-    }
-	
-	public Partition getPartitionByAlias(String alias) {
-        if (alias == null || alias.length() == 0) return null;
-		for (Partition p : mPartitions) {
-        	if (alias.equals(p.getAlias())) {
-        		return p;
-        	}
-        }
-        return null;
-    }
-	
-	public Partition getBootPartition() {
-		return getPartitionByAlias("boot");
-	}
-	
-	public Partition getRecoveryPartition() {
-		return getPartitionByAlias("recovery");
-	}
-	
-	// TODO ui facing strings
-	@Override
-	public LinkedHashMap<String, String> getContents() {
-		LinkedHashMap<String, String> contents = new LinkedHashMap<String, String>();
-		
-		// Interesting mounts
-		contents.put("System Mount index", String.valueOf(mMounts.indexOf(getSystemMount())));
-		contents.put("Data Mount index", String.valueOf(mMounts.indexOf(getDataMount())));
-		contents.put("Cache Mount index", String.valueOf(mMounts.indexOf(getCacheMount())));
-		contents.put("Root Mount index", String.valueOf(mMounts.indexOf(getRootMount())));		
-		List<Mount> sdMounts = getSdcardMounts();
-		for (int i = 0; i < sdMounts.size(); ++i) {				
-			contents.put("SD card Mount " + i + " index", 
-					String.valueOf(mMounts.indexOf(sdMounts.get(i))));			
-		}
-		
-		// All mounts
-		LinkedHashMap<String, String> subcontents;
-		for (int i = 0, len = mMounts.size(); i < len; ++i) {
-			subcontents = mMounts.get(i).getContents();
-			for (String s : subcontents.keySet()) {
-				contents.put("Mount " + i + " " + s, subcontents.get(s));				
-			}
-		}
-		
-		// Interesting partitions
-		contents.put("Boot Partition index", String.valueOf(mPartitions.indexOf(getBootPartition())));
-		contents.put("Recovery Partition index", String.valueOf(mPartitions.indexOf(getRecoveryPartition())));
-		
-		// All partitions
-		for (int i = 0, len = mPartitions.size(); i < len; ++i) {
-			subcontents = mPartitions.get(i).getContents();
-			for (String s : subcontents.keySet()) {
-				contents.put("Partition " + i + " " + s, subcontents.get(s));				
-			}
-		}
-		
-		// Aliased partitions
-		List<Partition> aliased = getAliasedPartitions();
-		for (int i = 0, len = aliased.size(); i < len; ++i) {
-			contents.put("Aliased Partition " + i + " index", 
-					String.valueOf(mPartitions.indexOf(aliased.get(i)))
-					+ " (" + aliased.get(i).getAlias() + ")");
-		}
-		
-		return contents;
 	}
 }

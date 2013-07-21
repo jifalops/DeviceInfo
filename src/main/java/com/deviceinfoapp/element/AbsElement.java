@@ -9,13 +9,9 @@ public abstract class AbsElement {
 
     protected static final int API = Build.VERSION.SDK_INT;
 
-	private Context mContext;
+	protected Context mContext;
 	
 	public AbsElement(Context context) {
 		mContext = context;
 	}
-	
-	public final Context getContext() {
-		return mContext;
-    }
 }

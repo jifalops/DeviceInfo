@@ -539,9 +539,9 @@ public class Bluetooth extends ActiveElement {
 		};
 		
 		boolean a,b,c = false;
-		a = mBluetoothAdapter.getProfileProxy(getContext(), listener, BluetoothProfile.A2DP);
-		b = mBluetoothAdapter.getProfileProxy(getContext(), listener, BluetoothProfile.HEADSET);
-		if (API >= 14) c = mBluetoothAdapter.getProfileProxy(getContext(), listener, BluetoothProfile.HEALTH);
+		a = mBluetoothAdapter.getProfileProxy(mContext, listener, BluetoothProfile.A2DP);
+		b = mBluetoothAdapter.getProfileProxy(mContext, listener, BluetoothProfile.HEADSET);
+		if (API >= 14) c = mBluetoothAdapter.getProfileProxy(mContext, listener, BluetoothProfile.HEALTH);
 
         if (a || b || c) super.start();
 	}

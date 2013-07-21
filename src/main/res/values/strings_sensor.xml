@@ -20,6 +20,7 @@
     <string name="sensor_category_motion">Motion</string>
     <string name="sensor_category_position">Position</string>
     <string name="sensor_category_environment">Environment</string>
+    <string name="sensor_category_other">Other</string>
     
     <string name="sensor_default">Default</string>
     <string name="sensor_name">Name</string>
