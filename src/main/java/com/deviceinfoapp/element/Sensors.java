@@ -8,6 +8,9 @@ import android.hardware.SensorManager;
 
 import com.deviceinfoapp.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // TODO add microphone
 public class Sensors extends ActiveElement implements SensorEventListener {
 	private static final String LOG_TAG = Sensors.class.getSimpleName();
@@ -34,35 +37,38 @@ public class Sensors extends ActiveElement implements SensorEventListener {
         FREQUENCY_MEDIUM   = 200,
         FREQUENCY_LOW      = 500,
 
-        ACTION_ACCELEROMETER_ACCURACY    = 0,
-        ACTION_ACCELEROMETER_EVENT       = 1,
-        ACTION_AMBIENT_TEMPERATURE_ACCURACY    = 2,
-        ACTION_AMBIENT_TEMPERATURE_EVENT       = 3,
-        ACTION_GRAVITY_ACCURACY    = 4,
-        ACTION_GRAVITY_EVENT       = 5,
-        ACTION_GYROSCOPE_ACCURACY    = 6,
-        ACTION_GYROSCOPE_EVENT       = 7,
-        ACTION_LIGHT_ACCURACY    = 8,
-        ACTION_LIGHT_EVENT       = 9,
-        ACTION_LINEAR_ACCELERATION_ACCURACY    = 10,
-        ACTION_LINEAR_ACCELERATION_EVENT       = 11,
-        ACTION_MAGNETIC_FIELD_ACCURACY    = 12,
-        ACTION_MAGNETIC_FIELD_EVENT       = 13,
-        ACTION_ORIENTATION_ACCURACY    = 14,
-        ACTION_ORIENTATION_EVENT       = 15,
-        ACTION_PRESSURE_ACCURACY    = 16,
-        ACTION_PRESSURE_EVENT       = 17,
-        ACTION_PROXIMITY_ACCURACY    = 18,
-        ACTION_PROXIMITY_EVENT       = 19,
-        ACTION_RELATIVE_HUMIDITY_ACCURACY    = 20,
-        ACTION_RELATIVE_HUMIDITY_EVENT       = 21,
-        ACTION_ROTATION_VECTOR_ACCURACY    = 22,
-        ACTION_ROTATION_VECTOR_EVENT       = 23,
-        ACTION_TEMPERATURE_ACCURACY    = 24,
-        ACTION_TEMPERATURE_EVENT       = 25;
+        ACTION_SENSOR_ACCURACY = 0,
+        ACTION_SENSOR_EVENT = 1;
+
+//        ACTION_ACCELEROMETER_ACCURACY    = 0,
+//        ACTION_ACCELEROMETER_EVENT       = 1,
+//        ACTION_AMBIENT_TEMPERATURE_ACCURACY    = 2,
+//        ACTION_AMBIENT_TEMPERATURE_EVENT       = 3,
+//        ACTION_GRAVITY_ACCURACY    = 4,
+//        ACTION_GRAVITY_EVENT       = 5,
+//        ACTION_GYROSCOPE_ACCURACY    = 6,
+//        ACTION_GYROSCOPE_EVENT       = 7,
+//        ACTION_LIGHT_ACCURACY    = 8,
+//        ACTION_LIGHT_EVENT       = 9,
+//        ACTION_LINEAR_ACCELERATION_ACCURACY    = 10,
+//        ACTION_LINEAR_ACCELERATION_EVENT       = 11,
+//        ACTION_MAGNETIC_FIELD_ACCURACY    = 12,
+//        ACTION_MAGNETIC_FIELD_EVENT       = 13,
+//        ACTION_ORIENTATION_ACCURACY    = 14,
+//        ACTION_ORIENTATION_EVENT       = 15,
+//        ACTION_PRESSURE_ACCURACY    = 16,
+//        ACTION_PRESSURE_EVENT       = 17,
+//        ACTION_PROXIMITY_ACCURACY    = 18,
+//        ACTION_PROXIMITY_EVENT       = 19,
+//        ACTION_RELATIVE_HUMIDITY_ACCURACY    = 20,
+//        ACTION_RELATIVE_HUMIDITY_EVENT       = 21,
+//        ACTION_ROTATION_VECTOR_ACCURACY    = 22,
+//        ACTION_ROTATION_VECTOR_EVENT       = 23,
+//        ACTION_TEMPERATURE_ACCURACY    = 24,
+//        ACTION_TEMPERATURE_EVENT       = 25;
 
     private static final int
-        ACTIVE_ACTIONS     = 26;
+        ACTIVE_ACTIONS     = 2;
 
 
     public interface Callbacks extends ActiveElement.Callbacks {
@@ -115,9 +121,25 @@ public class Sensors extends ActiveElement implements SensorEventListener {
         mRelativeHumidityValues,
         mAmbientTemperatureValues;
 
-	
     
 	private SensorManager mSensorManager;
+    
+    private Sensor[] mSensors;
+
+    private List<Sensor> 
+        mAccelerometerSensors,
+        mAmbientTemperatureSensors,
+        mGravitySensors,
+        mGyroscopeSensors,
+        mLightSensors,
+        mLinearAccelerationSensors,
+        mMagneticFieldSensors,
+        mOrientationSensors,
+        mPressureSensors,
+        mProximitySensors,
+        mRelativeHumiditySensors,
+        mRotationVectorSensors,
+        mTemperatureSensors;
     
 	public Sensors(Context context, Sensors.Callbacks callbacks) {
 		super(context, callbacks);
@@ -160,36 +182,141 @@ public class Sensors extends ActiveElement implements SensorEventListener {
         CATEGORY_OTHER = context.getString(R.string.sensor_category_other);
 
         setActiveActionCount(ACTIVE_ACTIONS);
-        setActionThrottle(ACTION_ACCELEROMETER_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_ACCELEROMETER_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_AMBIENT_TEMPERATURE_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_AMBIENT_TEMPERATURE_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_GRAVITY_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_GRAVITY_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_GYROSCOPE_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_GYROSCOPE_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_LIGHT_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_LIGHT_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_LINEAR_ACCELERATION_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_LINEAR_ACCELERATION_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_MAGNETIC_FIELD_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_MAGNETIC_FIELD_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_ORIENTATION_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_ORIENTATION_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_PRESSURE_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_PRESSURE_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_PROXIMITY_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_PROXIMITY_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_RELATIVE_HUMIDITY_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_RELATIVE_HUMIDITY_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_ROTATION_VECTOR_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_ROTATION_VECTOR_EVENT, FREQUENCY_LOW);
-        setActionThrottle(ACTION_TEMPERATURE_ACCURACY, FREQUENCY_LOW);
-        setActionThrottle(ACTION_TEMPERATURE_EVENT, FREQUENCY_LOW);
+        setActionThrottle(ACTION_SENSOR_ACCURACY, FREQUENCY_MEDIUM);
+        setActionThrottle(ACTION_SENSOR_EVENT, FREQUENCY_MEDIUM);
+//        setActionThrottle(ACTION_ACCELEROMETER_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_ACCELEROMETER_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_AMBIENT_TEMPERATURE_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_AMBIENT_TEMPERATURE_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_GRAVITY_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_GRAVITY_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_GYROSCOPE_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_GYROSCOPE_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_LIGHT_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_LIGHT_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_LINEAR_ACCELERATION_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_LINEAR_ACCELERATION_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_MAGNETIC_FIELD_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_MAGNETIC_FIELD_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_ORIENTATION_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_ORIENTATION_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_PRESSURE_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_PRESSURE_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_PROXIMITY_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_PROXIMITY_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_RELATIVE_HUMIDITY_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_RELATIVE_HUMIDITY_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_ROTATION_VECTOR_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_ROTATION_VECTOR_EVENT, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_TEMPERATURE_ACCURACY, FREQUENCY_LOW);
+//        setActionThrottle(ACTION_TEMPERATURE_EVENT, FREQUENCY_LOW);
+
+        mAccelerometerSensors = new ArrayList<Sensor>();
+        mAmbientTemperatureSensors = new ArrayList<Sensor>();
+        mGravitySensors = new ArrayList<Sensor>();
+        mGyroscopeSensors = new ArrayList<Sensor>();
+        mLightSensors = new ArrayList<Sensor>();
+        mLinearAccelerationSensors = new ArrayList<Sensor>();
+        mMagneticFieldSensors = new ArrayList<Sensor>();
+        mOrientationSensors = new ArrayList<Sensor>();
+        mPressureSensors = new ArrayList<Sensor>();
+        mProximitySensors = new ArrayList<Sensor>();
+        mRelativeHumiditySensors = new ArrayList<Sensor>();
+        mRotationVectorSensors = new ArrayList<Sensor>();
+        mTemperatureSensors = new ArrayList<Sensor>();
+
+        List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+
+        // Add default sensors first.
+        for (Sensor s : sensors) {
+            if (s == mSensorManager.getDefaultSensor(s.getType()))
+                addSensor(s);
+        }
+        // Then other sensors.
+        for (Sensor s : sensors) {
+            if (s != mSensorManager.getDefaultSensor(s.getType()))
+                addSensor(s);
+        }
+
+        List<Sensor> list = new ArrayList<Sensor>();
+        list.addAll(mAccelerometerSensors);
+        list.addAll(mAmbientTemperatureSensors);
+        list.addAll(mGravitySensors);
+        list.addAll(mGyroscopeSensors);
+        list.addAll(mLightSensors);
+        list.addAll(mLinearAccelerationSensors);
+        list.addAll(mMagneticFieldSensors);
+        list.addAll(mOrientationSensors);
+        list.addAll(mPressureSensors);
+        list.addAll(mProximitySensors);
+        list.addAll(mRelativeHumiditySensors);
+        list.addAll(mRotationVectorSensors);
+        list.addAll(mTemperatureSensors);
+        mSensors = list.toArray(new Sensor[list.size()]);
 	}
+
+    private void addSensor(Sensor s) {
+        switch (s.getType()) {
+        case TYPE_ACCELEROMETER:            mAccelerometerSensors.add(s);           break;
+        case TYPE_AMBIENT_TEMPERATURE:      mAmbientTemperatureSensors.add(s);      break;
+        case TYPE_GRAVITY:                  mGravitySensors.add(s);                 break;
+        case TYPE_GYROSCOPE:                mGyroscopeSensors.add(s);               break;
+        case TYPE_LIGHT:                    mLightSensors.add(s);                   break;
+        case TYPE_LINEAR_ACCELERATION:      mLinearAccelerationSensors.add(s);      break;
+        case TYPE_MAGNETIC_FIELD:           mMagneticFieldSensors.add(s);           break;
+        case TYPE_ORIENTATION:              mOrientationSensors.add(s);             break;
+        case TYPE_PRESSURE:                 mPressureSensors.add(s);                break;
+        case TYPE_PROXIMITY:                mProximitySensors.add(s);               break;
+        case TYPE_RELATIVE_HUMIDITY:        mRelativeHumiditySensors.add(s);        break;
+        case TYPE_ROTATION_VECTOR:          mRotationVectorSensors.add(s);          break;
+        case TYPE_TEMPERATURE:              mTemperatureSensors.add(s);             break;
+        }
+    }
+
+    public List<Sensor> getSensors(int type) {
+        switch (type) {
+        case TYPE_ACCELEROMETER:            return mAccelerometerSensors;
+        case TYPE_AMBIENT_TEMPERATURE:      return mAmbientTemperatureSensors;
+        case TYPE_GRAVITY:                  return mGravitySensors;
+        case TYPE_GYROSCOPE:                return mGyroscopeSensors;
+        case TYPE_LIGHT:                    return mLightSensors;
+        case TYPE_LINEAR_ACCELERATION:      return mLinearAccelerationSensors;
+        case TYPE_MAGNETIC_FIELD:           return mMagneticFieldSensors;
+        case TYPE_ORIENTATION:              return mOrientationSensors;
+        case TYPE_PRESSURE:                 return mPressureSensors;
+        case TYPE_PROXIMITY:                return mProximitySensors;
+        case TYPE_RELATIVE_HUMIDITY:        return mRelativeHumiditySensors;
+        case TYPE_ROTATION_VECTOR:          return mRotationVectorSensors;
+        case TYPE_TEMPERATURE:              return mTemperatureSensors;
+        default:                            return null;
+        }
+    }
+
+    public String getSensorName(int type) {
+        switch (type) {
+            case TYPE_ACCELEROMETER:            return SENSOR_ACCELEROMETER;
+            case TYPE_AMBIENT_TEMPERATURE:      return SENSOR_AMBIENT_TEMPERATURE;
+            case TYPE_GRAVITY:                  return SENSOR_GRAVITY;
+            case TYPE_GYROSCOPE:                return SENSOR_GYROSCOPE;
+            case TYPE_LIGHT:                    return SENSOR_LIGHT;
+            case TYPE_LINEAR_ACCELERATION:      return SENSOR_LINEAR_ACCELERATION;
+            case TYPE_MAGNETIC_FIELD:           return SENSOR_MAGNETIC_FIELD;
+            case TYPE_ORIENTATION:              return SENSOR_ORIENTATION;
+            case TYPE_PRESSURE:                 return SENSOR_PRESSURE;
+            case TYPE_PROXIMITY:                return SENSOR_PROXIMITY;
+            case TYPE_RELATIVE_HUMIDITY:        return SENSOR_RELATIVE_HUMIDITY;
+            case TYPE_ROTATION_VECTOR:          return SENSOR_ROTATION_VECTOR;
+            case TYPE_TEMPERATURE:              return SENSOR_TEMPERATURE;
+            default:                            return null;
+        }
+    }
 
     public SensorManager getSensorManager() {
         return mSensorManager;
+    }
+
+    public Sensor[] getSensors() {
+        return mSensors;
     }
 
     public String getCategory(int type) {
@@ -248,44 +375,44 @@ public class Sensors extends ActiveElement implements SensorEventListener {
         }
         return null;
     }
-    
-    private int getAccuracyAction(int sensorType) {
-        switch (sensorType) {
-            case TYPE_GRAVITY:              return ACTION_GRAVITY_ACCURACY;
-            case TYPE_GYROSCOPE:            return ACTION_GYROSCOPE_ACCURACY;
-            case TYPE_LINEAR_ACCELERATION:  return ACTION_LINEAR_ACCELERATION_ACCURACY;
-            case TYPE_ROTATION_VECTOR:      return ACTION_ROTATION_VECTOR_ACCURACY;
-            case TYPE_ACCELEROMETER:        return ACTION_ACCELEROMETER_ACCURACY;
-            case TYPE_LIGHT:                return ACTION_LIGHT_ACCURACY;
-            case TYPE_RELATIVE_HUMIDITY:    return ACTION_RELATIVE_HUMIDITY_ACCURACY;
-            case TYPE_PRESSURE:             return ACTION_PRESSURE_ACCURACY;
-            case TYPE_TEMPERATURE:          return ACTION_TEMPERATURE_ACCURACY;
-            case TYPE_AMBIENT_TEMPERATURE:  return ACTION_AMBIENT_TEMPERATURE_ACCURACY;
-            case TYPE_ORIENTATION:          return ACTION_ORIENTATION_ACCURACY;
-            case TYPE_PROXIMITY:            return ACTION_PROXIMITY_ACCURACY;
-            case TYPE_MAGNETIC_FIELD:       return ACTION_MAGNETIC_FIELD_ACCURACY;
-            default:                        return -1;
-        }
-    }
-
-    private int getEventAction(int sensorType) {
-        switch (sensorType) {
-            case TYPE_GRAVITY:              return ACTION_GRAVITY_EVENT;
-            case TYPE_GYROSCOPE:            return ACTION_GYROSCOPE_EVENT;
-            case TYPE_LINEAR_ACCELERATION:  return ACTION_LINEAR_ACCELERATION_EVENT;
-            case TYPE_ROTATION_VECTOR:      return ACTION_ROTATION_VECTOR_EVENT;
-            case TYPE_ACCELEROMETER:        return ACTION_ACCELEROMETER_EVENT;
-            case TYPE_LIGHT:                return ACTION_LIGHT_EVENT;
-            case TYPE_RELATIVE_HUMIDITY:    return ACTION_RELATIVE_HUMIDITY_EVENT;
-            case TYPE_PRESSURE:             return ACTION_PRESSURE_EVENT;
-            case TYPE_TEMPERATURE:          return ACTION_TEMPERATURE_EVENT;
-            case TYPE_AMBIENT_TEMPERATURE:  return ACTION_AMBIENT_TEMPERATURE_EVENT;
-            case TYPE_ORIENTATION:          return ACTION_ORIENTATION_EVENT;
-            case TYPE_PROXIMITY:            return ACTION_PROXIMITY_EVENT;
-            case TYPE_MAGNETIC_FIELD:       return ACTION_MAGNETIC_FIELD_EVENT;
-            default:                        return -1;
-        }
-    }
+//
+//    private int getAccuracyAction(int sensorType) {
+//        switch (sensorType) {
+//            case TYPE_GRAVITY:              return ACTION_GRAVITY_ACCURACY;
+//            case TYPE_GYROSCOPE:            return ACTION_GYROSCOPE_ACCURACY;
+//            case TYPE_LINEAR_ACCELERATION:  return ACTION_LINEAR_ACCELERATION_ACCURACY;
+//            case TYPE_ROTATION_VECTOR:      return ACTION_ROTATION_VECTOR_ACCURACY;
+//            case TYPE_ACCELEROMETER:        return ACTION_ACCELEROMETER_ACCURACY;
+//            case TYPE_LIGHT:                return ACTION_LIGHT_ACCURACY;
+//            case TYPE_RELATIVE_HUMIDITY:    return ACTION_RELATIVE_HUMIDITY_ACCURACY;
+//            case TYPE_PRESSURE:             return ACTION_PRESSURE_ACCURACY;
+//            case TYPE_TEMPERATURE:          return ACTION_TEMPERATURE_ACCURACY;
+//            case TYPE_AMBIENT_TEMPERATURE:  return ACTION_AMBIENT_TEMPERATURE_ACCURACY;
+//            case TYPE_ORIENTATION:          return ACTION_ORIENTATION_ACCURACY;
+//            case TYPE_PROXIMITY:            return ACTION_PROXIMITY_ACCURACY;
+//            case TYPE_MAGNETIC_FIELD:       return ACTION_MAGNETIC_FIELD_ACCURACY;
+//            default:                        return -1;
+//        }
+//    }
+//
+//    private int getEventAction(int sensorType) {
+//        switch (sensorType) {
+//            case TYPE_GRAVITY:              return ACTION_GRAVITY_EVENT;
+//            case TYPE_GYROSCOPE:            return ACTION_GYROSCOPE_EVENT;
+//            case TYPE_LINEAR_ACCELERATION:  return ACTION_LINEAR_ACCELERATION_EVENT;
+//            case TYPE_ROTATION_VECTOR:      return ACTION_ROTATION_VECTOR_EVENT;
+//            case TYPE_ACCELEROMETER:        return ACTION_ACCELEROMETER_EVENT;
+//            case TYPE_LIGHT:                return ACTION_LIGHT_EVENT;
+//            case TYPE_RELATIVE_HUMIDITY:    return ACTION_RELATIVE_HUMIDITY_EVENT;
+//            case TYPE_PRESSURE:             return ACTION_PRESSURE_EVENT;
+//            case TYPE_TEMPERATURE:          return ACTION_TEMPERATURE_EVENT;
+//            case TYPE_AMBIENT_TEMPERATURE:  return ACTION_AMBIENT_TEMPERATURE_EVENT;
+//            case TYPE_ORIENTATION:          return ACTION_ORIENTATION_EVENT;
+//            case TYPE_PROXIMITY:            return ACTION_PROXIMITY_EVENT;
+//            case TYPE_MAGNETIC_FIELD:       return ACTION_MAGNETIC_FIELD_EVENT;
+//            default:                        return -1;
+//        }
+//    }
 
 
     //
@@ -323,35 +450,37 @@ public class Sensors extends ActiveElement implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        int action = getAccuracyAction(sensor.getType());
-        if (!isActionAllowed(action)) return;
+//        int action = getAccuracyAction(sensor.getType());
+        if (!isActionAllowed(ACTION_SENSOR_ACCURACY)) return;
 
-        setActionTime(action);
+        // TODO other classes implement these in the opposite order.
         ((Callbacks) mCallbacks).onAccuracyChanged(sensor, accuracy);
+        setActionTime(ACTION_SENSOR_ACCURACY);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        int action = getEventAction(event.sensor.getType());
-        if (!isActionAllowed(action)) return;
+//        int action = getEventAction(event.sensor.getType());
+        if (!isActionAllowed(ACTION_SENSOR_EVENT)) return;
 
-        switch (action) {
-            case ACTION_ACCELEROMETER_EVENT:
+        switch (event.sensor.getType()) {
+            case TYPE_ACCELEROMETER:
                 mAccelerometerValues = event.values.clone();
                 break;
-            case ACTION_MAGNETIC_FIELD_EVENT:
+            case TYPE_MAGNETIC_FIELD:
                 mMagneticFieldValues = event.values.clone();
                 break;
-            case ACTION_AMBIENT_TEMPERATURE_EVENT:
+            case TYPE_AMBIENT_TEMPERATURE:
                 mAmbientTemperatureValues = event.values.clone();
                 break;
-            case ACTION_RELATIVE_HUMIDITY_EVENT:
+            case TYPE_RELATIVE_HUMIDITY:
                 mRelativeHumidityValues = event.values.clone();
                 break;
         }
 
-        setActionTime(action);
+        // TODO other classes implement these in the opposite order.
         ((Callbacks) mCallbacks).onSensorChanged(event);
+        setActionTime(ACTION_SENSOR_EVENT);
     }
 	
 	@Override

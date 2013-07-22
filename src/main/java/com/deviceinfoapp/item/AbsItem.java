@@ -1,4 +1,4 @@
-package com.deviceinfoapp.viewable;
+package com.deviceinfoapp.item;
 
 /**
  * Created by Jake on 7/18/13.

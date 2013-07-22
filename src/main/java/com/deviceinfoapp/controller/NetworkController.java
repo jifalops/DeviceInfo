@@ -3,7 +3,7 @@ package com.deviceinfoapp.controller;
 import android.content.Context;
 
 import com.deviceinfoapp.element.Network;
-import com.deviceinfoapp.viewable.Item;
+import com.deviceinfoapp.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;

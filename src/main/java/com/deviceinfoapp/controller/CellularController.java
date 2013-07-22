@@ -10,8 +10,8 @@ import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 
 import com.deviceinfoapp.element.Cellular;
-import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item2;
+import com.deviceinfoapp.item.Item;
+import com.deviceinfoapp.item.Item2;
 
 import java.util.ArrayList;
 import java.util.List;

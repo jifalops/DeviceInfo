@@ -8,7 +8,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 
 import com.deviceinfoapp.element.Wifi;
-import com.deviceinfoapp.viewable.Item;
+import com.deviceinfoapp.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;

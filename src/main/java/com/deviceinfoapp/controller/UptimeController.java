@@ -4,8 +4,8 @@ import android.content.Context;
 
 import com.deviceinfoapp.DeviceInfo;
 import com.deviceinfoapp.element.Uptime;
-import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item2;
+import com.deviceinfoapp.item.Item;
+import com.deviceinfoapp.item.Item2;
 
 import java.util.ArrayList;
 import java.util.List;

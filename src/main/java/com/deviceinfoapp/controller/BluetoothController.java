@@ -9,11 +9,11 @@ import android.content.Context;
 import com.deviceinfoapp.R;
 import com.deviceinfoapp.element.Bluetooth;
 import com.deviceinfoapp.element.UnavailableFeatureException;
-import com.deviceinfoapp.viewable.Header;
-import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item1;
-import com.deviceinfoapp.viewable.Item2;
-import com.deviceinfoapp.viewable.SubHeader;
+import com.deviceinfoapp.item.Header;
+import com.deviceinfoapp.item.Item;
+import com.deviceinfoapp.item.Item1;
+import com.deviceinfoapp.item.Item2;
+import com.deviceinfoapp.item.SubHeader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,10 @@ public class BluetoothController extends ActiveElementController implements Blue
             mElement = new Bluetooth(context, this);
         } catch (UnavailableFeatureException e) {
             mElement = null;
+            return;
         }
+
+
     }
 
     @Override

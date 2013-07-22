@@ -17,7 +17,7 @@ import android.widget.ListView;
 
 import com.deviceinfoapp.data.Elements;
 import com.deviceinfoapp.data.NavData;
-import com.deviceinfoapp.viewable.DrawerItemArrayAdapter;
+import com.deviceinfoapp.item.DrawerItemArrayAdapter;
 
 /**
  * Created by Jake on 6/24/13.

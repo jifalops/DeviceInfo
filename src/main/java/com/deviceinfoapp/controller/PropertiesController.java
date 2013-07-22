@@ -4,8 +4,8 @@ import android.content.Context;
 
 import com.deviceinfoapp.element.Properties;
 import com.deviceinfoapp.util.ShellHelper;
-import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item2;
+import com.deviceinfoapp.item.Item;
+import com.deviceinfoapp.item.Item2;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

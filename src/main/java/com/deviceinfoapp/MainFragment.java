@@ -51,10 +51,10 @@ import com.deviceinfoapp.controller.StorageController;
 import com.deviceinfoapp.controller.UptimeController;
 import com.deviceinfoapp.controller.WifiController;
 import com.deviceinfoapp.data.Elements;
-import com.deviceinfoapp.viewable.AbsItem1;
-import com.deviceinfoapp.viewable.AbsItem2;
-import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.ItemExpandableListAdapter;
+import com.deviceinfoapp.item.AbsItem1;
+import com.deviceinfoapp.item.AbsItem2;
+import com.deviceinfoapp.item.Item;
+import com.deviceinfoapp.item.ItemExpandableListAdapter;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -86,7 +86,7 @@ public class MainFragment
     private int mItem;
 
     private AbsElementController mController;
-    private boolean mIsActive, mIsPlaying;
+    private boolean mIsActionable, mIsPlaying;
     private MenuItem mIndicatorMenuItem, mPlayPauseMenuItem;
     private Handler mHandler;
     private boolean mIsShowing;
@@ -206,7 +206,7 @@ public class MainFragment
 
             if (mController != null) {
                 if (mController instanceof ActiveElementController) {
-                    mIsActive = true;
+                    mIsActionable = ((ActiveElementController) mController).isActionable();
                     mPlayImmediately = false;
                 }
                 mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
@@ -221,7 +221,7 @@ public class MainFragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (mIsActive) {
+        if (mIsActionable) {
             inflater.inflate(R.menu.fragment_detail_dynamic, menu);
             mIndicatorMenuItem = menu.findItem(R.id.menu_indicator);
             mPlayPauseMenuItem = menu.findItem(R.id.menu_playpause);
@@ -280,7 +280,7 @@ public class MainFragment
     public void onPause() {
         super.onPause();
         if (mIsVisibleInPager) return;
-        if (mIsActive) {
+        if (mIsActionable) {
 
             mHandler.removeCallbacksAndMessages(null);
             stop();
@@ -364,12 +364,12 @@ public class MainFragment
                 item = (Item) mAdapter.getChild(groupPosition, childPosition);
                 if (item.hasChanged()) {
                     if (item instanceof AbsItem1) {
-                        tv =(TextView) mListView.getChildAt(count).findViewById(R.id.text);
-                        tv.setText(((AbsItem1) item).getText());
+                        tv = (TextView) mListView.getChildAt(count).findViewById(R.id.text);
+                        if (tv != null) tv.setText(((AbsItem1) item).getText());
                     }
                     else if (item instanceof AbsItem2) {
-                        tv =(TextView) mListView.getChildAt(count).findViewById(R.id.text2);
-                        tv.setText(((AbsItem2) item).getText2());
+                        tv = (TextView) mListView.getChildAt(count).findViewById(R.id.text2);
+                        if (tv != null) tv.setText(((AbsItem2) item).getText2());
                     }
                 }
             }

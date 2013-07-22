@@ -4,9 +4,8 @@ import android.content.Context;
 import android.os.Build;
 
 import com.deviceinfoapp.element.AbsElement;
-import com.deviceinfoapp.viewable.Item;
+import com.deviceinfoapp.item.Item;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -1,8 +1,8 @@
 package com.deviceinfoapp.data;
 
-import com.deviceinfoapp.viewable.DrawerHeader;
-import com.deviceinfoapp.viewable.DrawerItem;
-import com.deviceinfoapp.viewable.Item;
+import com.deviceinfoapp.item.DrawerHeader;
+import com.deviceinfoapp.item.DrawerItem;
+import com.deviceinfoapp.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;

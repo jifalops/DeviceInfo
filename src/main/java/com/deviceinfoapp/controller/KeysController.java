@@ -5,9 +5,9 @@ import android.content.Context;
 import com.deviceinfoapp.R;
 import com.deviceinfoapp.element.Keys;
 import com.deviceinfoapp.element.UnavailableFeatureException;
-import com.deviceinfoapp.viewable.Header;
-import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item1;
+import com.deviceinfoapp.item.Header;
+import com.deviceinfoapp.item.Item;
+import com.deviceinfoapp.item.Item1;
 
 import java.util.ArrayList;
 import java.util.List;

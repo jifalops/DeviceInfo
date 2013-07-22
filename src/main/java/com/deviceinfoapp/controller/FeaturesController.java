@@ -2,12 +2,10 @@ package com.deviceinfoapp.controller;
 
 import android.content.Context;
 
-import com.deviceinfoapp.element.Display;
 import com.deviceinfoapp.element.Features;
-import com.deviceinfoapp.viewable.Header;
-import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item1;
-import com.deviceinfoapp.viewable.Item2;
+import com.deviceinfoapp.item.Header;
+import com.deviceinfoapp.item.Item;
+import com.deviceinfoapp.item.Item1;
 
 import java.util.ArrayList;
 import java.util.List;

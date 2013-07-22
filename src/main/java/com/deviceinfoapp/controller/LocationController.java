@@ -5,7 +5,7 @@ import android.location.Address;
 import android.os.Bundle;
 
 import com.deviceinfoapp.element.Location;
-import com.deviceinfoapp.viewable.Item;
+import com.deviceinfoapp.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,8 +6,8 @@ import android.os.Build;
 import com.deviceinfoapp.element.Cellular;
 import com.deviceinfoapp.element.Graphics;
 import com.deviceinfoapp.element.Platform;
-import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item2;
+import com.deviceinfoapp.item.Item;
+import com.deviceinfoapp.item.Item2;
 
 import java.util.ArrayList;
 import java.util.List;
