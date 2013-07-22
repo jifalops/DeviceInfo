@@ -169,7 +169,7 @@ public class SensorsController extends ActiveElementController implements Sensor
         if (mHasAggregateData) {
             data.add(new Header("Aggregate Data"));
             if (mWorldX != null) {
-                data.add(new SubHeader("World Coordinates (" + e.getUnit(Sensors.TYPE_ORIENTATION)));
+                data.add(new SubHeader("World Coordinates (" + e.getUnit(Sensors.TYPE_ORIENTATION) + ")"));
                 data.add(mWorldX);
                 data.add(mWorldY);
                 data.add(mWorldZ);
@@ -261,8 +261,8 @@ public class SensorsController extends ActiveElementController implements Sensor
                     float[] coords = s.getOrientationInWorldCoordinateSystem();
                     if (coords != null) {
                         mWorldX.setText2(String.valueOf(coords[0]));
-                        mWorldY.setText2(String.valueOf(coords[0]));
-                        mWorldZ.setText2(String.valueOf(coords[0]));
+                        mWorldY.setText2(String.valueOf(coords[1]));
+                        mWorldZ.setText2(String.valueOf(coords[2]));
                         mWorldAccuracy.setText2(acc);
                     }
                     break;

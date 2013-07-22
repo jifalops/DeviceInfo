@@ -211,7 +211,10 @@ public class MainFragment
                 }
                 mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
                 mListView.setAdapter(mAdapter);
-                mListView.expandGroup(0);
+
+                for (int i = 0; i < mAdapter.getGroupCount(); ++i) {
+                    mListView.expandGroup(i);
+                }
             }
         }
 

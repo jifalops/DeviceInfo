@@ -8,8 +8,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 
-import java.util.LinkedHashMap;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -91,11 +89,15 @@ public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 	
 	
 	public void onPause() {
-		mGlSurfaceView.onPause();
+        if (mGlSurfaceView != null) {
+		    mGlSurfaceView.onPause();
+        }
 	}
 	
 	public void onResume() {
-		mGlSurfaceView.onResume();
+        if (mGlSurfaceView != null) {
+            mGlSurfaceView.onResume();
+        }
 	}
 	
 	
