@@ -7,13 +7,14 @@ public abstract class ActiveElement extends AbsElement {
     private static final int DEFAULT_ACTION_THROTTLE = 1; // ms
 
 	public interface Callbacks {
-        void onStarted();
-        void onStopped();
-        void onAction(int item, long timestamp);
+        void onAction(int item);
     }
 
+    protected abstract void start();
+    protected abstract void stop();
+
 	protected Callbacks mCallbacks;
-    private boolean mIsActive;
+    protected boolean mIsActive;
     private long[] mActionTimestamps;
     private int[] mActionThrottles;
 
@@ -21,28 +22,11 @@ public abstract class ActiveElement extends AbsElement {
 	public ActiveElement(Context context, Callbacks callbacks) {
 		super(context);
         mCallbacks = callbacks;
-        mIsActive = false;
 	}
 
     public final boolean isActive() {
         return mIsActive;
     }
-
-    /**
-     * Call super at the END of subclass implementation only if element was started.
-     */
-	public void start() {
-        mIsActive = true;
-		mCallbacks.onStarted();
-	}
-
-    /**
-     * Call super at the END of subclass implementation only if element was stopped.
-     */
-	public void stop() {
-        mIsActive = false;
-        mCallbacks.onStopped();
-	}
 
     public void setActiveActionCount(int count) {
         mActionTimestamps = new long[count];
@@ -67,7 +51,7 @@ public abstract class ActiveElement extends AbsElement {
     public void setActionTime(int action) {
         long time = System.currentTimeMillis();
         mActionTimestamps[action] = time;
-        mCallbacks.onAction(action, time);
+        mCallbacks.onAction(action);
     }
 
     public long getActionTime(int action) {

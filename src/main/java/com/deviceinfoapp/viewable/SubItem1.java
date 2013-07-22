@@ -8,11 +8,7 @@ import com.deviceinfoapp.R;
 public class SubItem1 extends AbsItem1 {
 
     public SubItem1(CharSequence text) {
-        this(text, null);
-    }
-
-    public SubItem1(CharSequence text, int[] actions) {
-        super(text, R.layout.sublist_item_1, actions);
+        super(text, R.layout.sublist_item_1);
     }
 
     @Override

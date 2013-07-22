@@ -22,6 +22,8 @@ public interface Item {
     int getViewType();
     View getView(LayoutInflater inflater, View convertView);
 
-    int[] getActions();
-    boolean respondsTo(int action);
+    /**
+     * Whether the item's data has changed since the last call to getView().
+     */
+    boolean hasChanged();
 }

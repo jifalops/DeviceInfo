@@ -402,7 +402,7 @@ public class Wifi extends ActiveElement {
 
 	@Override
 	public void start() {
-		if (isActive()) return;
+		if (mIsActive) return;
 		mContext.registerReceiver(mReceiver, 
 				new IntentFilter(WifiManager.NETWORK_IDS_CHANGED_ACTION));
 		mContext.registerReceiver(mReceiver, 
@@ -415,13 +415,13 @@ public class Wifi extends ActiveElement {
 				new IntentFilter(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
 		mContext.registerReceiver(mReceiver, 
 				new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
-		super.start();
+		mIsActive = true;
 	}
 
 	@Override
 	public void stop() {
-		if (!isActive()) return;
+		
 		mContext.unregisterReceiver(mReceiver);
-		super.stop();
+		mIsActive = false;
 	}
 }

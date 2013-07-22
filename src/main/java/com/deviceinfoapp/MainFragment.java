@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import com.deviceinfoapp.controller.AbsElementController;
 import com.deviceinfoapp.controller.ActiveElementController;
@@ -50,6 +51,8 @@ import com.deviceinfoapp.controller.StorageController;
 import com.deviceinfoapp.controller.UptimeController;
 import com.deviceinfoapp.controller.WifiController;
 import com.deviceinfoapp.data.Elements;
+import com.deviceinfoapp.viewable.AbsItem1;
+import com.deviceinfoapp.viewable.AbsItem2;
 import com.deviceinfoapp.viewable.Item;
 import com.deviceinfoapp.viewable.ItemExpandableListAdapter;
 
@@ -74,6 +77,7 @@ public class MainFragment
             UptimeController.Callbacks,
             WifiController.Callbacks
         {
+    private static final String LOG_TAG = MainFragment.class.getSimpleName();
 
     public static final String ARG_ITEM_ID = "item_id";
 
@@ -91,6 +95,8 @@ public class MainFragment
     private ItemExpandableListAdapter mAdapter;
     protected ExpandableListView mListView;
 
+    private boolean mIsVisibleInPager;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -105,6 +111,10 @@ public class MainFragment
         mHandler = new Handler();
 
 
+    }
+
+    public void setIsVisibleInPager(boolean visible) {
+        mIsVisibleInPager = visible;
     }
 
     @Override
@@ -130,7 +140,8 @@ public class MainFragment
 //            getActivity().setTitle(items[mItem]);
 
             switch (mItem) {
-                case Elements.OVERVIEW: break;
+                case Elements.OVERVIEW:
+                    break;
                 case Elements.PROCESSORS:
                     mController = new CpuController(getActivity(), this);
                     break;
@@ -207,11 +218,6 @@ public class MainFragment
         return root;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -264,24 +270,35 @@ public class MainFragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (!mIsVisibleInPager) return;
+
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
+        if (mIsVisibleInPager) return;
         if (mIsActive) {
-            stop();
+
             mHandler.removeCallbacksAndMessages(null);
-            mIndicatorMenuItem.setIcon(R.drawable.indicator_inactive);
+            stop();
+//            mIndicatorMenuItem.setIcon(R.drawable.indicator_inactive);
         }
     }
 
     private void start() {
+        if (mIsPlaying) return;
         ((ActiveElementController) mController).start();
         mPlayPauseMenuItem.setIcon(R.drawable.pause);
         mIsPlaying = true;
     }
 
     private void stop() {
+        if (mIsVisibleInPager && !mIsPlaying) return;
         ((ActiveElementController) mController).stop();
-        mPlayPauseMenuItem.setIcon(R.drawable.play);
+        if (mPlayPauseMenuItem != null) mPlayPauseMenuItem.setIcon(R.drawable.play);
         mIsPlaying = false;
     }
 
@@ -308,23 +325,13 @@ public class MainFragment
     //
 
     @Override
-    public void onStarted() {
+    public void onAction(int action) {
+//        mAdapter.notifyDataSetChanged();
+//        mListView.invalidate();
 
-    }
-
-    @Override
-    public void onStopped() {
-
-    }
-
-    @Override
-    public void onAction(int action, long timestamp) {
-        int pos = mListView.getFirstVisiblePosition();
-        int count = mListView.getChildCount();
-        Item item;
-        for (int i = pos; i < count; ++i) {
-            //item = (Item) mAdapter.g
-        }
+//        mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
+//        mListView.setAdapter(mAdapter);
+//        mListView.expandGroup(0);
 
         listVisibleRowsForExpandableGroup();
 //        mAdapter.notifyDataSetChanged();
@@ -343,6 +350,8 @@ public class MainFragment
 
         int count = firstVis;
 
+        Item item = null;
+        TextView tv = null;
         while (count <= lastVis)
         {
             long longposition = mListView.getExpandableListPosition(count);
@@ -351,6 +360,18 @@ public class MainFragment
                 int groupPosition = mListView.getPackedPositionGroup(longposition);
                 int childPosition = mListView.getPackedPositionChild(longposition);
                 Log.d("Test", "group: " + groupPosition + " and child: " + childPosition);
+
+                item = (Item) mAdapter.getChild(groupPosition, childPosition);
+                if (item.hasChanged()) {
+                    if (item instanceof AbsItem1) {
+                        tv =(TextView) mListView.getChildAt(count).findViewById(R.id.text);
+                        tv.setText(((AbsItem1) item).getText());
+                    }
+                    else if (item instanceof AbsItem2) {
+                        tv =(TextView) mListView.getChildAt(count).findViewById(R.id.text2);
+                        tv.setText(((AbsItem2) item).getText2());
+                    }
+                }
             }
             count++;
 

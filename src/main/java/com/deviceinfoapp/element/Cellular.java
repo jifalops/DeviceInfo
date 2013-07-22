@@ -325,7 +325,7 @@ public class Cellular extends ActiveElement {
 
     @Override
     public void start() {
-        if (isActive()) return;
+        if (mIsActive) return;
         mListener = new MyPhoneStateListener();
         mTelephonyManager.listen(mListener,
                 PhoneStateListener.LISTEN_CALL_FORWARDING_INDICATOR
@@ -337,14 +337,14 @@ public class Cellular extends ActiveElement {
                         | PhoneStateListener.LISTEN_SERVICE_STATE
                         | PhoneStateListener.LISTEN_SIGNAL_STRENGTHS
         );
-        super.start();
+        mIsActive = true;
     }
 
     @Override
     public void stop() {
-        if (!isActive()) return;
+        
         mTelephonyManager.listen(mListener, PhoneStateListener.LISTEN_NONE);
-        super.stop();
+        mIsActive = false;
     }
 
 	private class MyPhoneStateListener extends PhoneStateListener {

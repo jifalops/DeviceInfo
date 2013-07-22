@@ -8,11 +8,7 @@ import com.deviceinfoapp.R;
 public class SubHeader extends AbsItem1 {
 
     public SubHeader(CharSequence text) {
-        this(text, null);
-    }
-
-    public SubHeader(CharSequence text, int[] actions) {
-        super(text, R.layout.subheader_item, actions);
+        super(text, R.layout.subheader_item);
     }
 
     @Override

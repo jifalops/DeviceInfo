@@ -28,11 +28,17 @@ public class SensorsController extends ActiveElementController implements Sensor
     }
 
     @Override
-    public List<Item> getData() {
-        Sensors e = (Sensors) mElement;
-//        int[] actions = new int[] {Sensors.ACTION_BATTERY};
+    protected void update(int action) {
 
+    }
+
+    @Override
+    public List<Item> getData() {
         List<Item> data = new ArrayList<Item>();
+
+        Sensors e = (Sensors) mElement;
+
+
 
         // Main
 
@@ -620,6 +626,16 @@ public class SensorsController extends ActiveElementController implements Sensor
 //        }
 
         return data;
+    }
+
+    @Override
+    public void start() {
+        ((Sensors) mElement).start();
+    }
+
+    @Override
+    public void stop() {
+        ((Sensors) mElement).stop();
     }
 
     @Override

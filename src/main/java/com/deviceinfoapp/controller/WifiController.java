@@ -33,6 +33,11 @@ public class WifiController extends ActiveElementController implements Wifi.Call
     }
 
     @Override
+    protected void update(int action) {
+
+    }
+
+    @Override
     public List<Item> getData() {
         Wifi e = (Wifi) mElement;
 //        int[] actions = new int[] {Battery.ACTION_BATTERY};
@@ -143,6 +148,16 @@ public class WifiController extends ActiveElementController implements Wifi.Call
 //        }
 
         return data;
+    }
+
+    @Override
+    public void start() {
+        ((Wifi) mElement).start();
+    }
+
+    @Override
+    public void stop() {
+        ((Wifi) mElement).stop();
     }
 
 

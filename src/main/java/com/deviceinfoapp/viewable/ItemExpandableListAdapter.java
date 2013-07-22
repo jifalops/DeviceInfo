@@ -63,7 +63,7 @@ public class ItemExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         if (groupPosition == 0) {
-            return mInflater.inflate(R.layout.empty_view, null);
+            return mInflater.inflate(R.layout.empty_view, parent, false);
         } else {
             View v = ((Item) getGroup(groupPosition)).getView(mInflater, convertView);
             int res = isExpanded
@@ -100,7 +100,7 @@ public class ItemExpandableListAdapter extends BaseExpandableListAdapter {
             int size = groups.size();
 
             mGroups = new int[size + 1][2];
-            mGroups[0][POSITION] = 0;
+            mGroups[0][POSITION] = -1;
 
             if (size == 0) {
                 mGroups[0][CHILDREN] = mItems.size();

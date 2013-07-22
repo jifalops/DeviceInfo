@@ -26,18 +26,32 @@ public class RamController extends ActiveElementController implements Ram.Callba
     }
 
     @Override
-    public List<Item> getData() {
-        Ram e = (Ram) mElement;
-        int[] actions = new int[] {Ram.ACTION_UPDATE};
+    protected void update(int action) {
 
+    }
+
+    @Override
+    public List<Item> getData() {
         List<Item> data = new ArrayList<Item>();
+
+        Ram e = (Ram) mElement;
 
         Map<String, String> map = e.getMeminfo();
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            data.add(new Item2(entry.getKey(), entry.getValue(), actions));
+            data.add(new Item2(entry.getKey(), entry.getValue()));
         }
 
         return data;
+    }
+
+    @Override
+    public void start() {
+        ((Ram) mElement).start();
+    }
+
+    @Override
+    public void stop() {
+        ((Ram) mElement).stop();
     }
 
     @Override

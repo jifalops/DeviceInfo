@@ -515,7 +515,7 @@ public class Bluetooth extends ActiveElement {
 
 	@Override
 	public void start() {
-		if (API < 11 || isActive()) return;
+		if (API < 11 || mIsActive) return;
 
 		BluetoothProfile.ServiceListener listener = new BluetoothProfile.ServiceListener() {			
 			@Override
@@ -543,15 +543,15 @@ public class Bluetooth extends ActiveElement {
 		b = mBluetoothAdapter.getProfileProxy(mContext, listener, BluetoothProfile.HEADSET);
 		if (API >= 14) c = mBluetoothAdapter.getProfileProxy(mContext, listener, BluetoothProfile.HEALTH);
 
-        if (a || b || c) super.start();
+        if (a || b || c) mIsActive = true;
 	}
 
 	@Override
 	public void stop() {
-		if (API < 11 || !isActive()) return;
+		if (API < 11 || !mIsActive) return;
 		mBluetoothAdapter.closeProfileProxy(BluetoothProfile.A2DP, mA2dpProfile);
 		mBluetoothAdapter.closeProfileProxy(BluetoothProfile.HEADSET, mHeadsetProfile);
 		if (API >= 14) mBluetoothAdapter.closeProfileProxy(BluetoothProfile.HEALTH, mHealthProfile);
-		super.stop();
+		mIsActive = false;
 	}
 }

@@ -109,15 +109,15 @@ public class Ram extends ActiveElement {
 	
 	@Override
 	public void start() {
-		if (isActive()) return;
+		if (mIsActive) return;
 		mUpdateTask.start();
-		super.start();
+		mIsActive = true;
 	}
 	
 	@Override
 	public void stop() {
-		if (!isActive()) return;
+		
 		mUpdateTask.stop();
-		super.stop();
+		mIsActive = false;
 	}
 }

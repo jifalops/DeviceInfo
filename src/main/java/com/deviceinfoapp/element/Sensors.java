@@ -356,18 +356,18 @@ public class Sensors extends ActiveElement implements SensorEventListener {
 	
 	@Override
 	public void start() {
-		if (isActive()) return;
+		if (mIsActive) return;
         for (Sensor s : mSensorManager.getSensorList(Sensor.TYPE_ALL)) {
             mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_UI);
         }
-        super.start();
+        mIsActive = true;
 	}
 	
 	@Override
 	public void stop() {
-		if (!isActive()) return;
+		
         mSensorManager.unregisterListener(this);
-		super.stop();
+		mIsActive = false;
     }
 
 }

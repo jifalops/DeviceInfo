@@ -169,16 +169,16 @@ public class Battery extends ActiveElement {
 
     @Override
     public void start() {
-        if (isActive()) return;
+        if (mIsActive) return;
         mContext.registerReceiver(mBatteryReceiver, mIntentFilter);
-        super.start();
+        mIsActive = true;
     }
 
     @Override
     public void stop() {
-        if (!isActive()) return;
+        if (!mIsActive) return;
         mContext.unregisterReceiver(mBatteryReceiver);
-        super.stop();
+        mIsActive = false;
     }
 
 	private class BatteryChangedBroadcastReceiver extends BroadcastReceiver {

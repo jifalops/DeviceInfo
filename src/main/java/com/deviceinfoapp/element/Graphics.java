@@ -236,15 +236,15 @@ public class Graphics extends ActiveElement implements GLSurfaceView.Renderer {
 	
 	@Override
 	public void start() {
-		if (isActive()) return;
+		if (mIsActive) return;
 		onResume();
-		super.start();
+		mIsActive = true;
 	}
 	
 	@Override
 	public void stop() {
-		if (!isActive()) return;
+		
 		onPause();
-		super.stop();
+		mIsActive = false;
 	}
 }

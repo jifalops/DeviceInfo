@@ -1,21 +1,14 @@
 package com.deviceinfoapp.controller;
 
 import android.content.Context;
-import android.content.Intent;
 import android.location.Address;
-import android.location.GpsSatellite;
 import android.os.Bundle;
 
-import com.deviceinfoapp.element.ActiveElement;
-import com.deviceinfoapp.element.Battery;
 import com.deviceinfoapp.element.Location;
 import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item2;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Jake on 7/18/13.
@@ -46,11 +39,17 @@ public class LocationController extends ActiveElementController implements Locat
     }
 
     @Override
-    public List<Item> getData() {
-        Location e = (Location) mElement;
-//        int[] actions = new int[] {Battery.ACTION_BATTERY};
+    protected void update(int action) {
 
+    }
+
+    @Override
+    public List<Item> getData() {
         List<Item> data = new ArrayList<Item>();
+
+        Location e = (Location) mElement;
+
+
 
         // Main
 
@@ -192,6 +191,16 @@ public class LocationController extends ActiveElementController implements Locat
 //        }
 
         return data;
+    }
+
+    @Override
+    public void start() {
+        ((Location) mElement).start();
+    }
+
+    @Override
+    public void stop() {
+        ((Location) mElement).stop();
     }
 
     @Override

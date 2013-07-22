@@ -39,11 +39,15 @@ public class CellularController extends ActiveElementController implements Cellu
     }
 
     @Override
+    protected void update(int action) {
+
+    }
+
+    @Override
     public List<Item> getData() {
         List<Item> data = new ArrayList<Item>();
+
         Cellular e = (Cellular) mElement;
-        int[] actions = new int[] {Cellular.ACTION_CELL_LOCATION};
-       
 
         // Cellular info
         data.add(new Item2("MCC", String.valueOf(e.getMcc())));
@@ -132,6 +136,16 @@ public class CellularController extends ActiveElementController implements Cellu
         else data.add(new Item2("SignalStrength", null));
 
         return data;
+    }
+
+    @Override
+    public void start() {
+        ((Cellular) mElement).start();
+    }
+
+    @Override
+    public void stop() {
+        ((Cellular) mElement).stop();
     }
 
     @Override

@@ -33,21 +33,52 @@ public class MainActivity extends FragmentActivity {
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
+    private int mPreviousPosition;
+    private int mCurrentPosition;
+
+    private Fragment getActiveFragment(int position) {
+        return getSupportFragmentManager().findFragmentByTag("android:switcher:" + mViewPager.getId() + ":" + position);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mPreviousPosition = -1;
+
         mPagerAdapter = new ElementPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mPagerAdapter);mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                mDrawerList.setItemChecked(position, true);
+                mPreviousPosition = mCurrentPosition;
+                mCurrentPosition = position;
+
+                MainFragment prev, cur;
+                prev = (MainFragment) getActiveFragment(mPreviousPosition);
+                cur  = (MainFragment) getActiveFragment(mCurrentPosition);
+
+                if (prev != null) {
+                    prev.setIsVisibleInPager(false);
+                    prev.onPause();
+                }
+
+                if (cur != null) {
+                    cur.setIsVisibleInPager(true);
+                    cur.onResume();
+                }
+                mDrawerList.setItemChecked(mCurrentPosition, true);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged(state);
             }
         });
+//        mViewPager.setOffscreenPageLimit(3);
 
         mTitle = mDrawerTitle = getTitle();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

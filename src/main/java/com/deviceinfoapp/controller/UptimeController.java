@@ -25,17 +25,31 @@ public class UptimeController extends ActiveElementController implements Uptime.
     }
 
     @Override
+    protected void update(int action) {
+
+    }
+
+    @Override
     public List<Item> getData() {
         Uptime e = (Uptime) mElement;
-        int[] actions = new int[] {Uptime.ACTION_UPDATED};
 
         List<Item> data = new ArrayList<Item>();
 
-        data.add(new Item2("Uptime Total", DeviceInfo.getDuration((long) e.getUptimeTotal()), actions));
-        data.add(new Item2("Uptime Sleep", DeviceInfo.getDuration((long) e.getUptimeAsleep()), actions));
-        data.add(new Item2("Uptime Awake", DeviceInfo.getDuration((long) (e.getUptimeTotal() - e.getUptimeAsleep())), actions));
+        data.add(new Item2("Uptime Total", DeviceInfo.getDuration((long) e.getUptimeTotal())));
+        data.add(new Item2("Uptime Sleep", DeviceInfo.getDuration((long) e.getUptimeAsleep())));
+        data.add(new Item2("Uptime Awake", DeviceInfo.getDuration((long) (e.getUptimeTotal() - e.getUptimeAsleep()))));
 
         return data;
+    }
+
+    @Override
+    public void start() {
+        ((Uptime) mElement).start();
+    }
+
+    @Override
+    public void stop() {
+        ((Uptime) mElement).stop();
     }
 
     @Override

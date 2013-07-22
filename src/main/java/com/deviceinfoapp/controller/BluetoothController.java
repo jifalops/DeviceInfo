@@ -16,9 +16,7 @@ import com.deviceinfoapp.viewable.Item2;
 import com.deviceinfoapp.viewable.SubHeader;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,7 +29,6 @@ public class BluetoothController extends ActiveElementController implements Blue
         void onServiceDisconnected(int profile);
     }
 
-
     public BluetoothController(Context context, BluetoothController.Callbacks callbacks) {
         super(context, callbacks);
         try {
@@ -39,6 +36,11 @@ public class BluetoothController extends ActiveElementController implements Blue
         } catch (UnavailableFeatureException e) {
             mElement = null;
         }
+    }
+
+    @Override
+    protected void update(int action) {
+
     }
 
     @Override
@@ -153,6 +155,19 @@ public class BluetoothController extends ActiveElementController implements Blue
 
 
     @Override
+    public void start() {
+        ((Bluetooth) mElement).start();
+    }
+
+    @Override
+    public void stop() {
+        ((Bluetooth) mElement).stop();
+    }
+
+
+
+
+    @Override
     public void onServiceConnected(int profile, BluetoothProfile proxy) {
         ((Callbacks) mCallbacks).onServiceConnected(profile, proxy);
     }
@@ -161,4 +176,5 @@ public class BluetoothController extends ActiveElementController implements Blue
     public void onServiceDisconnected(int profile) {
         ((Callbacks) mCallbacks).onServiceDisconnected(profile);
     }
+
 }

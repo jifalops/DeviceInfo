@@ -356,23 +356,23 @@ public class Location extends ActiveElement implements GpsStatus.Listener, GpsSt
 
     @Override
     public void start() {
-        if (isActive()) return;
+        if (mIsActive) return;
         mLocationManager.addGpsStatusListener(this);
         mLocationManager.addNmeaListener(this);
         for (String s : mLocationManager.getAllProviders()) {
             mLocationManager.requestLocationUpdates(s, mMinTime, mMinDistance, this);
         }
-        super.start();
+        mIsActive = true;
     }
 
     @Override
     public void stop() {
-        if (!isActive()) return;
+        
         mLocationManager.removeGpsStatusListener(this);
         mLocationManager.removeNmeaListener(this);
 
         mLocationManager.removeUpdates(this);
 
-        super.stop();
+        mIsActive = false;
     }
 }

@@ -11,26 +11,25 @@ import com.deviceinfoapp.R;
  */
 public abstract class AbsItem1 extends AbsItem {
     private CharSequence mText;
-    private final int mLayoutRes;
 
-    public AbsItem1(CharSequence text, int layoutRes, int[] actions) {
-        super(actions);
+    public AbsItem1(CharSequence text, int layoutRes) {
+        super(layoutRes);
         mText = text;
-        mLayoutRes = layoutRes;
     }
 
-//    public void setText(final CharSequence text) {
-//        mText = text;
-//    }
-//
-//    public CharSequence getText() {
-//        return mText;
-//    }
+    public void setText(CharSequence text) {
+        mText = text;
+        mHasChanged = true;
+    }
+
+    public CharSequence getText() {
+        return mText;
+    }
 
     @Override
     public View getView(LayoutInflater inflater, View convertView) {
         ViewHolder holder;
-        if (convertView == null) {
+        if (convertView == null || !(convertView.getTag() instanceof ViewHolder)) {
             convertView = inflater.inflate(mLayoutRes, null);
             holder = new ViewHolder();
             holder.text = (TextView) convertView.findViewById(R.id.text);
@@ -39,6 +38,7 @@ public abstract class AbsItem1 extends AbsItem {
             holder = (ViewHolder) convertView.getTag();
         }
         holder.text.setText(mText);
+        mHasChanged = false;
         return convertView;
     }
 

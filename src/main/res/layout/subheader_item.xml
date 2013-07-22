@@ -6,5 +6,6 @@
           android:padding="@dimen/subItemPadding"
           android:gravity="center_vertical"
           android:textIsSelectable="true"
-          android:textAppearance="?android:attr/textAppearanceLarge" >
+          android:background="#ff17212c"
+          android:textAppearance="?android:attr/textAppearanceMedium" >
 </TextView>

@@ -8,10 +8,7 @@ import com.deviceinfoapp.R;
 public class DrawerItem extends AbsItem1 {
 
     public DrawerItem(CharSequence text) {
-        this(text, null);
-    }
-        public DrawerItem(CharSequence text, int[] actions) {
-        super(text, R.layout.drawer_list_item, actions);
+        super(text, R.layout.drawer_list_item);
     }
 
     @Override

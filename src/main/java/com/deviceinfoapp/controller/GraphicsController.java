@@ -1,16 +1,11 @@
 package com.deviceinfoapp.controller;
 
 import android.content.Context;
-import android.content.Intent;
 
-import com.deviceinfoapp.element.ActiveElement;
-import com.deviceinfoapp.element.Battery;
 import com.deviceinfoapp.element.Graphics;
 import com.deviceinfoapp.viewable.Item;
-import com.deviceinfoapp.viewable.Item2;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -36,11 +31,17 @@ public class GraphicsController extends ActiveElementController implements Graph
     }
 
     @Override
-    public List<Item> getData() {
-        Battery e = (Battery) mElement;
-        int[] actions = new int[] {Battery.ACTION_BATTERY};
+    protected void update(int action) {
 
+    }
+
+    @Override
+    public List<Item> getData() {
         List<Item> data = new ArrayList<Item>();
+
+        Graphics e = (Graphics) mElement;
+
+
 
         // Main
 //        @Override
@@ -91,6 +92,16 @@ public class GraphicsController extends ActiveElementController implements Graph
 
 
         return data;
+    }
+
+    @Override
+    public void start() {
+        ((Graphics) mElement).start();
+    }
+
+    @Override
+    public void stop() {
+        ((Graphics) mElement).stop();
     }
 
     @Override

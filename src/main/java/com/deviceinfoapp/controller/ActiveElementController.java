@@ -10,9 +10,7 @@ import com.deviceinfoapp.element.ActiveElement;
 public abstract class ActiveElementController extends AbsElementController implements ActiveElement.Callbacks {
 
     public interface Callbacks {
-        void onStarted();
-        void onStopped();
-        void onAction(int action, long timestamp);
+        void onAction(int action);
     }
 
     protected Callbacks mCallbacks;
@@ -22,13 +20,8 @@ public abstract class ActiveElementController extends AbsElementController imple
         mCallbacks = callbacks;
     }
 
-    public void start() {
-        ((ActiveElement) mElement).start();
-    }
 
-    public void stop() {
-        ((ActiveElement) mElement).stop();
-    }
+    protected abstract void update(int action);
 
     public void isActive() {
         ((ActiveElement) mElement).isActive();
@@ -38,19 +31,12 @@ public abstract class ActiveElementController extends AbsElementController imple
         return mElement != null;
     }
 
-
     @Override
-    public void onStarted() {
-        mCallbacks.onStarted();
+    public void onAction(int action) {
+        update(action);
+        mCallbacks.onAction(action);
     }
 
-    @Override
-    public void onStopped() {
-        mCallbacks.onStopped();
-    }
-
-    @Override
-    public void onAction(int action, long timestamp) {
-        mCallbacks.onAction(action, timestamp);
-    }
+    public abstract void start();
+    public abstract void stop();
 }

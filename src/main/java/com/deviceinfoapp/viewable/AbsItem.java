@@ -4,23 +4,15 @@ package com.deviceinfoapp.viewable;
  * Created by Jake on 7/18/13.
  */
 public abstract class AbsItem implements Item {
-    int[] mActions;
+    protected boolean mHasChanged;
+    protected final int mLayoutRes;
 
-    public AbsItem(int[] actions) {
-        mActions = actions;
+    public AbsItem(int layoutRes) {
+        mLayoutRes = layoutRes;
     }
 
     @Override
-    public int[] getActions() {
-        return mActions;
-    }
-
-    @Override
-    public boolean respondsTo(int action) {
-        if (mActions == null) return false;
-        for (int a : mActions) {
-            if (a == action) return true;
-        }
-        return false;
+    public boolean hasChanged() {
+        return mHasChanged;
     }
 }

@@ -27,7 +27,7 @@ public class Cpu extends ActiveElement {
     public static final int ACTION_UPDATED = 0;
 
     public interface Callbacks extends ActiveElement.Callbacks {
-		void onUpdated(int numCpuStatsUpdated);
+		void onCpuUpdated(int numCpuStatsUpdated);
 	}
 
 	private List<String> mCpuinfo;
@@ -72,7 +72,7 @@ public class Cpu extends ActiveElement {
             @Override
             public void run() {
                 setActionTime(ACTION_UPDATED);
-                ((Callbacks) mCallbacks).onUpdated(mNumStatsUpdated);
+                ((Callbacks) mCallbacks).onCpuUpdated(mNumStatsUpdated);
             }
         });
 
@@ -763,15 +763,15 @@ public class Cpu extends ActiveElement {
 
 	@Override
 	public void start() {
-		if (isActive()) return;
+		if (mIsActive) return;
 		mUpdateTask.start();
-		super.start();
+		mIsActive = true;
 	}
 	
 	@Override
 	public void stop() {
-		if (!isActive()) return;
+		
 		mUpdateTask.stop();
-		super.stop();
+		mIsActive = false;
 	}
 }

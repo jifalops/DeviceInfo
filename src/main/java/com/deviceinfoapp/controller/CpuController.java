@@ -23,11 +23,17 @@ public class CpuController extends ActiveElementController implements Cpu.Callba
     }
 
     @Override
-    public List<Item> getData() {
-        Cpu e = (Cpu) mElement;
-        int[] actions = new int[] {Cpu.ACTION_UPDATED};
+    protected void update(int action) {
 
+    }
+
+    @Override
+    public List<Item> getData() {
         List<Item> data = new ArrayList<Item>();
+
+        Cpu e = (Cpu) mElement;
+
+
 
         // Main TODO started to fix main, but want to use the setup from old app (elementview package)
 //        for (int i = 0; i < e.getCpuinfo().size(); ++i) {
@@ -169,7 +175,17 @@ public class CpuController extends ActiveElementController implements Cpu.Callba
     }
 
     @Override
-    public void onUpdated(int numCpuStatsUpdated) {
+    public void start() {
+        ((Cpu) mElement).start();
+    }
+
+    @Override
+    public void stop() {
+        ((Cpu) mElement).stop();
+    }
+
+    @Override
+    public void onCpuUpdated(int numCpuStatsUpdated) {
         ((Callbacks) mCallbacks).onCpuUpdated(numCpuStatsUpdated);
     }
 }
