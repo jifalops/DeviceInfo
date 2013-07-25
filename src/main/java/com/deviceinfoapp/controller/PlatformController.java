@@ -7,7 +7,7 @@ import com.deviceinfoapp.element.Cellular;
 import com.deviceinfoapp.element.Graphics;
 import com.deviceinfoapp.element.Platform;
 import com.deviceinfoapp.item.Item;
-import com.deviceinfoapp.item.Item2;
+import com.deviceinfoapp.item.ListItem2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,25 +28,25 @@ public class PlatformController extends AbsElementController {
 
         List<Item> data = new ArrayList<Item>();
 
-        data.add(new Item2("Manufacturer", Build.MANUFACTURER));
-        data.add(new Item2("Model", Build.MODEL));
-        data.add(new Item2("Device", Build.DEVICE));
-        data.add(new Item2("Brand", Build.BRAND));
-        data.add(new Item2("Android Name", e.getVersionName(API)));
-        data.add(new Item2("Android Version", Build.VERSION.RELEASE));
-        data.add(new Item2("Android API Level", String.valueOf(API)));
-        data.add(new Item2("Build Display", Build.DISPLAY));
-        data.add(new Item2("Build ID", Build.ID));
-        data.add(new Item2("Build Incremental Version", Build.VERSION.INCREMENTAL));
-        data.add(new Item2("Build Fingerprint", Build.FINGERPRINT));
-        data.add(new Item2("OpenGL Version", Graphics.openGlesVersion(mContext)));
-        data.add(new Item2("Kernel", e.getKernelVersion()));
-        data.add(new Item2("Radio Version", Cellular.getRadioVersion()));
-        data.add(new Item2("Radio Interface Version", Cellular.getRilVersion()));
-        data.add(new Item2("Baseband", Cellular.getBaseband()));
-        data.add(new Item2("Bootloader", Build.BOOTLOADER));
-        data.add(new Item2("Hardware", Build.HARDWARE));
-        data.add(new Item2("Board", Build.BOARD));
+        data.add(new ListItem2("Manufacturer", Build.MANUFACTURER));
+        data.add(new ListItem2("Model", Build.MODEL));
+        data.add(new ListItem2("Device", Build.DEVICE));
+        data.add(new ListItem2("Brand", Build.BRAND));
+        data.add(new ListItem2("Android Name", e.getVersionName(API)));
+        data.add(new ListItem2("Android Version", Build.VERSION.RELEASE));
+        data.add(new ListItem2("Android API Level", String.valueOf(API)));
+        data.add(new ListItem2("Build Display", Build.DISPLAY));
+        data.add(new ListItem2("Build ID", Build.ID));
+        data.add(new ListItem2("Build Incremental Version", Build.VERSION.INCREMENTAL));
+        data.add(new ListItem2("Build Fingerprint", Build.FINGERPRINT));
+        data.add(new ListItem2("OpenGL Version", Graphics.openGlesVersion(mContext)));
+        data.add(new ListItem2("Kernel", e.getKernelVersion()));
+        data.add(new ListItem2("Radio Version", Cellular.getRadioVersion()));
+        data.add(new ListItem2("Radio Interface Version", Cellular.getRilVersion()));
+        data.add(new ListItem2("Baseband", Cellular.getBaseband()));
+        data.add(new ListItem2("Bootloader", Build.BOOTLOADER));
+        data.add(new ListItem2("Hardware", Build.HARDWARE));
+        data.add(new ListItem2("Board", Build.BOARD));
 
         return data;
     }

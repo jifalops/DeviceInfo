@@ -5,7 +5,7 @@ import android.content.Context;
 import com.deviceinfoapp.DeviceInfo;
 import com.deviceinfoapp.element.Uptime;
 import com.deviceinfoapp.item.Item;
-import com.deviceinfoapp.item.Item2;
+import com.deviceinfoapp.item.ListItem2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +35,9 @@ public class UptimeController extends ActiveElementController implements Uptime.
 
         List<Item> data = new ArrayList<Item>();
 
-        data.add(new Item2("Uptime Total", DeviceInfo.getDuration((long) e.getUptimeTotal())));
-        data.add(new Item2("Uptime Sleep", DeviceInfo.getDuration((long) e.getUptimeAsleep())));
-        data.add(new Item2("Uptime Awake", DeviceInfo.getDuration((long) (e.getUptimeTotal() - e.getUptimeAsleep()))));
+        data.add(new ListItem2("Uptime Total", DeviceInfo.getDuration((long) e.getUptimeTotal())));
+        data.add(new ListItem2("Uptime Sleep", DeviceInfo.getDuration((long) e.getUptimeAsleep())));
+        data.add(new ListItem2("Uptime Awake", DeviceInfo.getDuration((long) (e.getUptimeTotal() - e.getUptimeAsleep()))));
 
         return data;
     }

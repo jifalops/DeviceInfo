@@ -37,19 +37,19 @@ public class CpuController extends ActiveElementController implements Cpu.Callba
 
         // Main TODO started to fix main, but want to use the setup from old app (elementview package)
 //        for (int i = 0; i < e.getCpuinfo().size(); ++i) {
-//            mData.add(new Item2("CPU Info " + i, e.getCpuinfo().get(i)));
+//            mData.add(new ListItem2("CPU Info " + i, e.getCpuinfo().get(i)));
 //        }
 //
 //        subcontents = mCpuStat.getContents();
 //        for (String s : subcontents.keySet()) {
-//            mData.add(new Item2("Overall CpuStat " + s, subcontents.get(s)));
+//            mData.add(new ListItem2("Overall CpuStat " + s, subcontents.get(s)));
 //        }
 //
 //        int i = 0;
 //        for (LogicalCpu logicalCpu : mLogicalCpus) {
 //            subcontents = logicalCpu.getContents();
 //            for (String s : subcontents.keySet()) {
-//                mData.add(new Item2("Logical CPU " + i + " " + s, subcontents.get(s)));
+//                mData.add(new ListItem2("Logical CPU " + i + " " + s, subcontents.get(s)));
 //            }
 //            ++i;
 //        }

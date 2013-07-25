@@ -19,6 +19,6 @@ public class DrawerItemArrayAdapter extends ItemArrayAdapter {
 
     @Override
     public boolean isEnabled(int position) {
-        return getItemViewType(position) == Item.TYPE_DRAWER_ITEM;
+        return getItemViewType(position) != Item.TYPE_HEADER;
     }
 }

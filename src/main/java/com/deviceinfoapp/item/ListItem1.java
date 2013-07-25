@@ -5,10 +5,10 @@ import com.deviceinfoapp.R;
 /**
  * Created by Jake on 7/17/13.
  */
-public class DrawerItem extends AbsListItem1 {
+public class ListItem1 extends AbsListItem1{
 
-    public DrawerItem(CharSequence text) {
-        super(text, R.layout.drawer_list_item);
+    public ListItem1(CharSequence text) {
+        super(text, R.layout.list_item_1);
     }
 
     @Override

@@ -4,7 +4,7 @@ import android.content.Context;
 
 public abstract class ActiveElement extends AbsElement {
 
-    private static final int DEFAULT_ACTION_THROTTLE = 1; // ms
+    private static final int DEFAULT_ACTION_THROTTLE = 100; // ms
 
 	public interface Callbacks {
         void onAction(int item);

@@ -5,9 +5,9 @@ import com.deviceinfoapp.R;
 /**
  * Created by Jake on 7/17/13.
  */
-public class SubItem1 extends AbsItem1 {
+public class ListSubItem1 extends AbsListItem1 {
 
-    public SubItem1(CharSequence text) {
+    public ListSubItem1(CharSequence text) {
         super(text, R.layout.sublist_item_1);
     }
 

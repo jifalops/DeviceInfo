@@ -51,8 +51,6 @@ import com.deviceinfoapp.controller.StorageController;
 import com.deviceinfoapp.controller.UptimeController;
 import com.deviceinfoapp.controller.WifiController;
 import com.deviceinfoapp.data.Elements;
-import com.deviceinfoapp.item.AbsItem1;
-import com.deviceinfoapp.item.AbsItem2;
 import com.deviceinfoapp.item.Item;
 import com.deviceinfoapp.item.ItemExpandableListAdapter;
 
@@ -83,7 +81,7 @@ public class MainFragment
 
     private static final int INDICATOR_DURATION = 200;
 
-    private int mItem;
+    private int mType;
 
     private AbsElementController mController;
     private boolean mIsActionable, mIsPlaying;
@@ -119,104 +117,42 @@ public class MainFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (container == null) {
+        if (container == null || !getArguments().containsKey(ARG_ITEM_ID)) {
             return null;
         }
 
-        View root = inflater.inflate(R.layout.fragment_item_detail, container, false);
+        mType = getArguments().getInt(ARG_ITEM_ID);
 
-        mListView = (ExpandableListView) root.findViewById(R.id.list);
-        mListView.setGroupIndicator(null);
+        mController = getController(mType);
 
-//        List<Item> info = null;
+        if (mController == null) {
+            return null;
+        }
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
-            mItem = getArguments().getInt(ARG_ITEM_ID);
+        if (mController instanceof ActiveElementController) {
+            mIsActionable = ((ActiveElementController) mController).isActionable();
+            mPlayImmediately = false;
+        }
 
-//            String[] items = getResources().getStringArray(R.array.main_items);
-//            getActivity().setTitle(items[mItem]);
+        View root = null;
 
-            switch (mItem) {
-                case Elements.OVERVIEW:
-                    break;
-                case Elements.PROCESSORS:
-                    mController = new CpuController(getActivity(), this);
-                    break;
-                case Elements.RAM:
-                    mController = new RamController(getActivity(), this);
-                    break;
-                case Elements.STORAGE:
-                    mController = new StorageController(getActivity());
-                    break;
-                case Elements.DISPLAY:
-                    mController = new DisplayController(getActivity());
-                    break;
-                case Elements.CAMERAS:
-                    mController = new CameraController(getActivity());
-                    break;
-                case Elements.BATTERY:
-                    mController = new BatteryController(getActivity(), this);
-                    break;
-                case Elements.SENSORS:
-                    mController = new SensorsController(getActivity(), this);
-                    break;
-                case Elements.AUDIO:
-                    mController = new AudioController(getActivity());
-                    break;
-                case Elements.GRAPHICS:
-                    mController = new GraphicsController(getActivity(), this);
-                    break;
-                case Elements.LOCATION:
-                    mController = new LocationController(getActivity(), this);
-                    break;
-                case Elements.NETWORK:
-                    mController = new NetworkController(getActivity());
-                    break;
-                case Elements.CELLULAR:
-                    mController = new CellularController(getActivity(), this);
-                    break;
-                case Elements.WIFI:
-                    mController = new WifiController(getActivity(), this);
-                    break;
-                case Elements.BLUETOOTH:
-                    mController = new BluetoothController(getActivity(), this);
-                    break;
-                case Elements.UPTIME:
-                    mController = new UptimeController(getActivity(), this);
-                    break;
-                case Elements.PLATFORM:
-                    mController = new PlatformController(getActivity());
-                    break;
-                case Elements.IDENTIFIERS:
-                    mController = new IdentifiersController(getActivity());
-                    break;
-                case Elements.FEATURES:
-                    mController = new FeaturesController(getActivity());
-                    break;
-                case Elements.PROPERTIES:
-                    mController = new PropertiesController(getActivity());
-                    break;
-                case Elements.KEYS:
-                    mController = new KeysController(getActivity());
-                    break;
-            }
+        if (mController.usesCachedViews()) {
 
-            if (mController != null) {
-                if (mController instanceof ActiveElementController) {
-                    mIsActionable = ((ActiveElementController) mController).isActionable();
-                    mPlayImmediately = false;
-                }
-                mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
-                mListView.setAdapter(mAdapter);
+        } else {
+            root = inflater.inflate(R.layout.fragment_item_detail, container, false);
 
-                for (int i = 0; i < mAdapter.getGroupCount(); ++i) {
-                    mListView.expandGroup(i);
-                }
+            mListView = (ExpandableListView) root.findViewById(R.id.list);
+            mListView.setGroupIndicator(null);
+
+            mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
+            mListView.setAdapter(mAdapter);
+
+            for (int i = 0; i < mAdapter.getGroupCount(); ++i) {
+                mListView.expandGroup(i);
             }
         }
+
+
 
         return root;
     }
@@ -368,16 +304,67 @@ public class MainFragment
                 if (item.hasChanged()) {
                     if (item instanceof AbsItem1) {
                         tv = (TextView) mListView.getChildAt(count).findViewById(R.id.text);
-                        if (tv != null) tv.setText(((AbsItem1) item).getText());
+                        tv.setText(((AbsItem1) item).getText());
                     }
                     else if (item instanceof AbsItem2) {
                         tv = (TextView) mListView.getChildAt(count).findViewById(R.id.text2);
-                        if (tv != null) tv.setText(((AbsItem2) item).getText2());
+                        tv.setText(((AbsItem2) item).getText2());
                     }
+                    item.setHasChanged(false);
                 }
             }
             count++;
 
+        }
+    }
+
+
+    private AbsElementController getController(int type) {
+        switch (mType) {
+            case Elements.OVERVIEW:
+                return null;
+            case Elements.PROCESSORS:
+                return new CpuController(getActivity(), this);
+            case Elements.RAM:
+                return new RamController(getActivity(), this);
+            case Elements.STORAGE:
+                return new StorageController(getActivity());
+            case Elements.DISPLAY:
+                return new DisplayController(getActivity());
+            case Elements.CAMERAS:
+                return new CameraController(getActivity());
+            case Elements.BATTERY:
+                return new BatteryController(getActivity(), this);
+            case Elements.SENSORS:
+                return new SensorsController(getActivity(), this);
+            case Elements.AUDIO:
+                return new AudioController(getActivity());
+            case Elements.GRAPHICS:
+                return new GraphicsController(getActivity(), this);
+            case Elements.LOCATION:
+                return new LocationController(getActivity(), this);
+            case Elements.NETWORK:
+                return new NetworkController(getActivity());
+            case Elements.CELLULAR:
+                return new CellularController(getActivity(), this);
+            case Elements.WIFI:
+                return new WifiController(getActivity(), this);
+            case Elements.BLUETOOTH:
+                return new BluetoothController(getActivity(), this);
+            case Elements.UPTIME:
+                return new UptimeController(getActivity(), this);
+            case Elements.PLATFORM:
+                return new PlatformController(getActivity());
+            case Elements.IDENTIFIERS:
+                return new IdentifiersController(getActivity());
+            case Elements.FEATURES:
+                return new FeaturesController(getActivity());
+            case Elements.PROPERTIES:
+                return new PropertiesController(getActivity());
+            case Elements.KEYS:
+                return new KeysController(getActivity());
+            default:
+                return null;
         }
     }
 

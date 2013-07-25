@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import com.deviceinfoapp.element.Battery;
 import com.deviceinfoapp.item.Item;
-import com.deviceinfoapp.item.Item2;
+import com.deviceinfoapp.item.ListItem2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class BatteryController extends ActiveElementController implements Batter
         void onReceive(Context context, Intent intent);
     }
 
-    private Item2
+    private ListItem2
         mLevel,
         mTemp,
         mCharging,
@@ -32,13 +32,13 @@ public class BatteryController extends ActiveElementController implements Batter
         super(context, callbacks);
         mElement = new Battery(context, this);
 
-        mLevel = new Item2("Level", "");
-        mTemp = new Item2("Temperature (C)", "");
-        mCharging = new Item2("Status", "");
-        mPlugged = new Item2("Plugged In Status", "");
-        mVoltage = new Item2("Voltage (mV)", "");
-        mTech = new Item2("Technology", "");
-        mHealth = new Item2("Health", "");
+        mLevel = new ListItem2("Level", "");
+        mTemp = new ListItem2("Temperature (C)", "");
+        mCharging = new ListItem2("Status", "");
+        mPlugged = new ListItem2("Plugged In Status", "");
+        mVoltage = new ListItem2("Voltage (mV)", "");
+        mTech = new ListItem2("Technology", "");
+        mHealth = new ListItem2("Health", "");
     }
 
     @Override

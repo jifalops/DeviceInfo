@@ -6,11 +6,12 @@ import android.hardware.SensorEvent;
 
 import com.deviceinfoapp.R;
 import com.deviceinfoapp.element.Sensors;
-import com.deviceinfoapp.item.AbsItem2;
-import com.deviceinfoapp.item.Header;
+import com.deviceinfoapp.item.AbsCachedItem2;
+import com.deviceinfoapp.item.CachedSubItem2;
+import com.deviceinfoapp.item.ExpandableListHeader;
 import com.deviceinfoapp.item.Item;
-import com.deviceinfoapp.item.SubHeader;
-import com.deviceinfoapp.item.SubItem2;
+import com.deviceinfoapp.item.ListSubHeader;
+import com.deviceinfoapp.item.ListSubItem2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public class SensorsController extends ActiveElementController implements Sensor
         void onSensorChanged(SensorEvent event);
     }
 
-    private AbsItem2
+    private AbsCachedItem2
             mWorldX,
             mWorldY,
             mWorldZ,
@@ -38,12 +39,15 @@ public class SensorsController extends ActiveElementController implements Sensor
             mHumidity,
             mHumidityAccuracy;
 
-    private Map<Sensor, AbsItem2[]> mSensorMap;
+    private Map<Sensor, AbsCachedItem2[]> mSensorMap;
 
     private boolean mHasAggregateData;
 
     public SensorsController(Context context, Callbacks callbacks) {
         super(context, callbacks);
+
+        mUsesCachedViews = true;
+
         Sensors e = new Sensors(context, this);
         mElement = e;
 
@@ -56,24 +60,24 @@ public class SensorsController extends ActiveElementController implements Sensor
         if (acc.size() > 0 && mag.size() > 0) {
             mHasAggregateData = true;
             String unit = e.getUnit(Sensors.TYPE_ORIENTATION);
-            mWorldX = new SubItem2("Azimuth (" + unit + ")", "");
-            mWorldY = new SubItem2("Pitch (" + unit + ")", "");
-            mWorldZ = new SubItem2("Roll (" + unit + ")", "");
-            mWorldAccuracy = new SubItem2("Accuracy", "");
+            mWorldX = new CachedSubItem2("Azimuth (" + unit + ")", "");
+            mWorldY = new CachedSubItem2("Pitch (" + unit + ")", "");
+            mWorldZ = new CachedSubItem2("Roll (" + unit + ")", "");
+            mWorldAccuracy = new CachedSubItem2("Accuracy", "");
         }
 
         if (amb.size() > 0 || hum.size() > 0) {
             mHasAggregateData = true;
-            mDewPoint = new SubItem2("Dew Point (" + context.getString(R.string.unit_degrees_celsius) + ")", "");
-            mHumidity = new SubItem2("Absolute Humidity (" + context.getString(R.string.unit_grams_per_cubic_meter) + ")", "");
-            mHumidityAccuracy = new SubItem2("Accuracy", "");
+            mDewPoint = new CachedSubItem2("Dew Point (" + context.getString(R.string.unit_degrees_celsius) + ")", "");
+            mHumidity = new CachedSubItem2("Absolute Humidity (" + context.getString(R.string.unit_grams_per_cubic_meter) + ")", "");
+            mHumidityAccuracy = new CachedSubItem2("Accuracy", "");
         }
 
         Sensor[] sensors = e.getSensors();
         int size = sensors.length;
 
-        mSensorMap = new HashMap<Sensor, AbsItem2[]>();
-        AbsItem2[] items = null;
+        mSensorMap = new HashMap<Sensor, AbsCachedItem2[]>();
+        AbsCachedItem2[] items = null;
         int type;
         String unit;
         for (int i = 0; i < size; ++i) {
@@ -82,75 +86,75 @@ public class SensorsController extends ActiveElementController implements Sensor
 
             switch (type) {
                 case Sensors.TYPE_ACCELEROMETER:
-                    items = new AbsItem2[4];
-                    items[1] = new SubItem2("X Acceleration (" + unit + ")", "");
-                    items[2] = new SubItem2("Y Acceleration (" + unit + ")", "");
-                    items[3] = new SubItem2("Z Acceleration (" + unit + ")", "");
+                    items = new AbsCachedItem2[4];
+                    items[1] = new CachedSubItem2("X Acceleration (" + unit + ")", "");
+                    items[2] = new CachedSubItem2("Y Acceleration (" + unit + ")", "");
+                    items[3] = new CachedSubItem2("Z Acceleration (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_AMBIENT_TEMPERATURE:
-                    items = new AbsItem2[2];
-                    items[1] = new SubItem2("Ambient Temp (" + unit + ")", "");
+                    items = new AbsCachedItem2[2];
+                    items[1] = new CachedSubItem2("Ambient Temp (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_GRAVITY:
-                    items = new AbsItem2[4];
-                    items[1] = new SubItem2("X Gravity (" + unit + ")", "");
-                    items[2] = new SubItem2("Y Gravity (" + unit + ")", "");
-                    items[3] = new SubItem2("Z Gravity (" + unit + ")", "");
+                    items = new AbsCachedItem2[4];
+                    items[1] = new CachedSubItem2("X Gravity (" + unit + ")", "");
+                    items[2] = new CachedSubItem2("Y Gravity (" + unit + ")", "");
+                    items[3] = new CachedSubItem2("Z Gravity (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_GYROSCOPE:
-                    items = new AbsItem2[4];
-                    items[1] = new SubItem2("X Angular Speed (" + unit + ")", "");
-                    items[2] = new SubItem2("Y Angular Speed (" + unit + ")", "");
-                    items[3] = new SubItem2("Z Angular Speed (" + unit + ")", "");
+                    items = new AbsCachedItem2[4];
+                    items[1] = new CachedSubItem2("X Angular Speed (" + unit + ")", "");
+                    items[2] = new CachedSubItem2("Y Angular Speed (" + unit + ")", "");
+                    items[3] = new CachedSubItem2("Z Angular Speed (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_LIGHT:
-                    items = new AbsItem2[2];
-                    items[1] = new SubItem2("Ambient light level (" + unit + ")", "");
+                    items = new AbsCachedItem2[2];
+                    items[1] = new CachedSubItem2("Ambient light level (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_LINEAR_ACCELERATION:
-                    items = new AbsItem2[4];
-                    items[1] = new SubItem2("X Linear Acceleration (" + unit + ")", "");
-                    items[2] = new SubItem2("Y Linear Acceleration (" + unit + ")", "");
-                    items[3] = new SubItem2("Z Linear Acceleration (" + unit + ")", "");
+                    items = new AbsCachedItem2[4];
+                    items[1] = new CachedSubItem2("X Linear Acceleration (" + unit + ")", "");
+                    items[2] = new CachedSubItem2("Y Linear Acceleration (" + unit + ")", "");
+                    items[3] = new CachedSubItem2("Z Linear Acceleration (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_MAGNETIC_FIELD:
-                    items = new AbsItem2[4];
-                    items[1] = new SubItem2("X Magnetic Field (" + unit + ")", "");
-                    items[2] = new SubItem2("Y Magnetic Field (" + unit + ")", "");
-                    items[3] = new SubItem2("Z Magnetic Field (" + unit + ")", "");
+                    items = new AbsCachedItem2[4];
+                    items[1] = new CachedSubItem2("X Magnetic Field (" + unit + ")", "");
+                    items[2] = new CachedSubItem2("Y Magnetic Field (" + unit + ")", "");
+                    items[3] = new CachedSubItem2("Z Magnetic Field (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_ORIENTATION:
-                    items = new AbsItem2[4];
-                    items[1] = new SubItem2("Azimuth (" + unit + ")", "");
-                    items[2] = new SubItem2("Pitch (" + unit + ")", "");
-                    items[3] = new SubItem2("Roll (" + unit + ")", "");
+                    items = new AbsCachedItem2[4];
+                    items[1] = new CachedSubItem2("Azimuth (" + unit + ")", "");
+                    items[2] = new CachedSubItem2("Pitch (" + unit + ")", "");
+                    items[3] = new CachedSubItem2("Roll (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_PRESSURE:
-                    items = new AbsItem2[2];
-                    items[1] = new SubItem2("Atmospheric Pressure (" + unit + ")", "");
+                    items = new AbsCachedItem2[2];
+                    items[1] = new CachedSubItem2("Atmospheric Pressure (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_PROXIMITY:
-                    items = new AbsItem2[2];
-                    items[1] = new SubItem2("Proximity (" + unit + ")", "");
+                    items = new AbsCachedItem2[2];
+                    items[1] = new CachedSubItem2("Proximity (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_RELATIVE_HUMIDITY:
-                    items = new AbsItem2[2];
-                    items[1] = new SubItem2("Relative humidity (" + unit + ")", "");
+                    items = new AbsCachedItem2[2];
+                    items[1] = new CachedSubItem2("Relative humidity (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_ROTATION_VECTOR:
-                    items = new AbsItem2[5];
-                    items[1] = new SubItem2("X Rotation Vector (" + unit + ")", "");
-                    items[2] = new SubItem2("Y Rotation Vector (" + unit + ")", "");
-                    items[3] = new SubItem2("Z Rotation Vector (" + unit + ")", "");
-                    items[4] = new SubItem2("Extra Rotation Vector (" + unit + ")", "");
+                    items = new AbsCachedItem2[5];
+                    items[1] = new CachedSubItem2("X Rotation Vector (" + unit + ")", "");
+                    items[2] = new CachedSubItem2("Y Rotation Vector (" + unit + ")", "");
+                    items[3] = new CachedSubItem2("Z Rotation Vector (" + unit + ")", "");
+                    items[4] = new CachedSubItem2("Extra Rotation Vector (" + unit + ")", "");
                     break;
                 case Sensors.TYPE_TEMPERATURE:
-                    items = new AbsItem2[2];
-                    items[1] = new SubItem2("Temperature (" + unit + ")", "");
+                    items = new AbsCachedItem2[2];
+                    items[1] = new CachedSubItem2("Temperature (" + unit + ")", "");
                     break;
             }
 
-            items[0] = new SubItem2("Accuracy", "");
+            items[0] = new CachedSubItem2("Accuracy", "");
             mSensorMap.put(sensors[i], items);
         }
     }
@@ -167,16 +171,16 @@ public class SensorsController extends ActiveElementController implements Sensor
         Sensors e = (Sensors) mElement;
 
         if (mHasAggregateData) {
-            data.add(new Header("Aggregate Data"));
+            data.add(new ExpandableListHeader("Aggregate Data"));
             if (mWorldX != null) {
-                data.add(new SubHeader("World Coordinates (" + e.getUnit(Sensors.TYPE_ORIENTATION) + ")"));
+                data.add(new ListSubHeader("World Coordinates"));
+                data.add(mWorldAccuracy);
                 data.add(mWorldX);
                 data.add(mWorldY);
                 data.add(mWorldZ);
-                data.add(mWorldAccuracy);
             }
             if (mDewPoint != null) {
-                data.add(new SubHeader("Environment Info"));
+                data.add(new ListSubHeader("Environment Info"));
                 data.add(mDewPoint);
                 data.add(mHumidity);
                 data.add(mHumidityAccuracy);
@@ -208,7 +212,7 @@ public class SensorsController extends ActiveElementController implements Sensor
         List<Sensor> sensorList = sensors.getSensors(type);
         if (sensorList.isEmpty()) return;
 
-        data.add(new Header(sensors.getSensorName(type)));
+        data.add(new ExpandableListHeader(sensors.getSensorName(type)));
 
         String unit = sensors.getUnit(type);
         boolean first = true;
@@ -216,14 +220,14 @@ public class SensorsController extends ActiveElementController implements Sensor
             for (Item item : mSensorMap.get(s)) {
                 data.add(item);
             }
-            data.add(new SubItem2("Name", s.getName()));
-            data.add(new SubItem2("Vendor", s.getVendor()));
-            data.add(new SubItem2("Version", String.valueOf(s.getVersion())));
-            data.add(new SubItem2("Default", String.valueOf(first)));
-            data.add(new SubItem2("Power (" + mamp + ")", String.valueOf(s.getPower())));
-            data.add(new SubItem2("Resolution (" + unit + ")", String.valueOf(s.getResolution())));
-            data.add(new SubItem2("Max Range (" + unit + ")", String.valueOf(s.getMaximumRange())));
-            data.add(new SubItem2("Min Delay (" + usec + ")", String.valueOf(s.getMinDelay())));
+            data.add(new ListSubItem2("Name", s.getName()));
+            data.add(new ListSubItem2("Vendor", s.getVendor()));
+            data.add(new ListSubItem2("Version", String.valueOf(s.getVersion())));
+            data.add(new ListSubItem2("Default", String.valueOf(first)));
+            data.add(new ListSubItem2("Power (" + mamp + ")", String.valueOf(s.getPower())));
+            data.add(new ListSubItem2("Resolution (" + unit + ")", String.valueOf(s.getResolution())));
+            data.add(new ListSubItem2("Max Range (" + unit + ")", String.valueOf(s.getMaximumRange())));
+            data.add(new ListSubItem2("Min Delay (" + usec + ")", String.valueOf(s.getMinDelay())));
             first = false;
         }
     }
@@ -249,7 +253,7 @@ public class SensorsController extends ActiveElementController implements Sensor
         Sensors s = (Sensors) mElement;
         String acc = s.getAccuracy(event.accuracy);
         mSensorMap.get(event.sensor)[0].setText2(acc);
-        AbsItem2[] items = mSensorMap.get(event.sensor);
+        AbsCachedItem2[] items = mSensorMap.get(event.sensor);
         for (int i = 1, len1 = items.length, len2 = event.values.length + 1; i < len1 && i < len2; ++i) {
             items[i].setText2(String.valueOf(event.values[i - 1]));
         }

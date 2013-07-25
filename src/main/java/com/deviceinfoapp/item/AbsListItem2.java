@@ -2,6 +2,7 @@ package com.deviceinfoapp.item;
 
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.deviceinfoapp.R;
@@ -9,39 +10,42 @@ import com.deviceinfoapp.R;
 /**
  * Created by Jake on 7/17/13.
  */
-public abstract class AbsItem2 extends AbsItem {
-    private CharSequence mText1;
-    private CharSequence mText2;
+public abstract class AbsListItem2 extends AbsListItem implements Item2 {
+    private CharSequence mText1, mText2;
 
-    public AbsItem2(CharSequence text1, CharSequence text2, int layoutRes) {
+    public AbsListItem2(CharSequence text1, CharSequence text2, int layoutRes) {
         super(layoutRes);
         mText1 = text1;
         mText2 = text2;
     }
 
-    public CharSequence getText1() {
-        return mText1;
-    }
-
-    public CharSequence getText2() {
-        return mText2;
-    }
-
+    @Override
     public void setText1(CharSequence text1) {
         mText1 = text1;
         mHasChanged = true;
     }
 
+    @Override
+    public CharSequence getText1() {
+        return mText1;
+    }
+
+    @Override
     public void setText2(CharSequence text2) {
         mText2 = text2;
         mHasChanged = true;
     }
 
     @Override
-    public View getView(LayoutInflater inflater, View convertView) {
+    public CharSequence getText2() {
+        return mText2;
+    }
+
+    @Override
+    public View getView(LayoutInflater inflater, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if (convertView == null || !(convertView.getTag() instanceof ViewHolder)) {
-            convertView = inflater.inflate(mLayoutRes, null);
+            convertView = inflater.inflate(mLayoutRes, parent, false);
             holder = new ViewHolder();
             holder.text1 = (TextView) convertView.findViewById(R.id.text1);
             holder.text2 = (TextView) convertView.findViewById(R.id.text2);

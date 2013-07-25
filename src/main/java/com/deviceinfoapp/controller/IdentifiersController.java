@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.deviceinfoapp.element.Identifiers;
 import com.deviceinfoapp.item.Item;
-import com.deviceinfoapp.item.Item2;
+import com.deviceinfoapp.item.ListItem2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +25,13 @@ public class IdentifiersController extends AbsElementController {
 
         List<Item> data = new ArrayList<Item>();
 
-        data.add(new Item2("Device ID", e.DEVICE_ID));
-        data.add(new Item2("Device Serial", e.DEVICE_SERIAL));
-        data.add(new Item2("Android ID", e.ANDROID_ID));
-        data.add(new Item2("Phone ID", e.PHONE_ID));
-        data.add(new Item2("SIM Serial", e.SIM_SERIAL));
-        data.add(new Item2("Line 1 Number", e.LINE_1_NUMBER));
-        data.add(new Item2("Subscriber ID", e.SUBSCRIBER_ID));
+        data.add(new ListItem2("Device ID", e.DEVICE_ID));
+        data.add(new ListItem2("Device Serial", e.DEVICE_SERIAL));
+        data.add(new ListItem2("Android ID", e.ANDROID_ID));
+        data.add(new ListItem2("Phone ID", e.PHONE_ID));
+        data.add(new ListItem2("SIM Serial", e.SIM_SERIAL));
+        data.add(new ListItem2("Line 1 Number", e.LINE_1_NUMBER));
+        data.add(new ListItem2("Subscriber ID", e.SUBSCRIBER_ID));
 
         return data;
     }

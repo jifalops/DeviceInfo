@@ -5,9 +5,9 @@ import com.deviceinfoapp.R;
 /**
  * Created by Jake on 7/17/13.
  */
-public class SubHeader extends AbsItem1 {
+public class ListSubHeader extends AbsListItem1 {
 
-    public SubHeader(CharSequence text) {
+    public ListSubHeader(CharSequence text) {
         super(text, R.layout.subheader_item);
     }
 

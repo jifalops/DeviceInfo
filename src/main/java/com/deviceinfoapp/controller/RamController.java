@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.deviceinfoapp.element.Ram;
 import com.deviceinfoapp.item.Item;
-import com.deviceinfoapp.item.Item2;
+import com.deviceinfoapp.item.ListItem2;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -38,7 +38,7 @@ public class RamController extends ActiveElementController implements Ram.Callba
 
         Map<String, String> map = e.getMeminfo();
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            data.add(new Item2(entry.getKey(), entry.getValue()));
+            data.add(new ListItem2(entry.getKey(), entry.getValue()));
         }
 
         return data;

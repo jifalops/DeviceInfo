@@ -15,6 +15,7 @@ public abstract class ActiveElementController extends AbsElementController imple
 
     protected Callbacks mCallbacks;
 
+
     public ActiveElementController(Context context, Callbacks callbacks) {
         super(context);
         mCallbacks = callbacks;

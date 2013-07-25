@@ -5,9 +5,9 @@ import com.deviceinfoapp.R;
 /**
  * Created by Jake on 7/17/13.
  */
-public class Header extends AbsItem1 {
+public class ExpandableCachedHeader extends AbsCachedItem1 {
 
-    public Header(CharSequence text) {
+    public ExpandableCachedHeader(CharSequence text) {
         super(text, R.layout.expandable_header);
     }
 

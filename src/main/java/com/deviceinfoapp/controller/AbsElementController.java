@@ -13,6 +13,7 @@ import java.util.List;
  */
 public abstract class AbsElementController {
     protected static final int API = Build.VERSION.SDK_INT;
+    protected boolean mUsesCachedViews;
 
     public abstract List<Item> getData();
 
@@ -21,9 +22,14 @@ public abstract class AbsElementController {
 
     public AbsElementController(Context context) {
         mContext = context;
+        mUsesCachedViews = false;
     }
 
     public AbsElement getElement() {
         return mElement;
+    }
+
+    public boolean usesCachedViews() {
+        return mUsesCachedViews;
     }
 }

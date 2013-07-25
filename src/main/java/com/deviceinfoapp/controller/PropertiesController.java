@@ -3,9 +3,9 @@ package com.deviceinfoapp.controller;
 import android.content.Context;
 
 import com.deviceinfoapp.element.Properties;
+import com.deviceinfoapp.item.ListItem2;
 import com.deviceinfoapp.util.ShellHelper;
 import com.deviceinfoapp.item.Item;
-import com.deviceinfoapp.item.Item2;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -29,7 +29,7 @@ public class PropertiesController extends AbsElementController {
         LinkedHashMap<String, String> map = ShellHelper.getProp();
 
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            data.add(new Item2(entry.getKey(), entry.getValue()));
+            data.add(new ListItem2(entry.getKey(), entry.getValue()));
         }
 
         return data;

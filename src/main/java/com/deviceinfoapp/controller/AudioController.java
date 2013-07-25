@@ -5,7 +5,7 @@ import android.text.TextUtils;
 
 import com.deviceinfoapp.element.Audio;
 import com.deviceinfoapp.item.Item;
-import com.deviceinfoapp.item.Item2;
+import com.deviceinfoapp.item.ListItem2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,26 +25,26 @@ public class AudioController extends AbsElementController {
         Audio e = (Audio) mElement;
         List<Item> data = new ArrayList<Item>();
         
-        data.add(new Item2("Mode", e.getMode()));
-        data.add(new Item2("Ringer Mode", e.getRingerMode()));
-        data.add(new Item2("System Volume", e.getSystemVolume() + "/" + e.getSystemVolumeMax()));
-        data.add(new Item2("Ring Volume", e.getRingVolume() + "/" + e.getRingVolumeMax()));
-        data.add(new Item2("Call Volume", e.getCallVolume() + "/" + e.getCallVolumeMax()));
-        data.add(new Item2("Music Volume", e.getMusicVolume() + "/" + e.getMusicVolumeMax()));
-        data.add(new Item2("Alarm Volume", e.getAlarmVolume() + "/" + e.getAlarmVolumeMax()));
-        data.add(new Item2("DTMF Volume", e.getDtmfVolume() + "/" + e.getDtmfVolumeMax()));
-        data.add(new Item2("Notification Volume", e.getNotificationVolume() + "/" + e.getNotificationVolumeMax()));
-        data.add(new Item2("Ringer Vibrate", e.getRingerVibrateSetting()));
-        data.add(new Item2("Notification Vibrate", e.getNotificationVibrateSetting()));
-        data.add(new Item2("Bluetooth A2DP On", String.valueOf(e.isBluetoothA2dpOn())));
-        data.add(new Item2("Bluetooth SCO On", String.valueOf(e.isBluetoothScoOn())));
-        data.add(new Item2("Bluetooth SCO Available Off Call", String.valueOf(e.isBluetoothScoAvailableOffCall())));
-        data.add(new Item2("Microphone Muted", String.valueOf(e.isMicrophoneMute())));
-        data.add(new Item2("Music Active", String.valueOf(e.isMusicActive())));
-        data.add(new Item2("Speakerphone On", String.valueOf(e.isSpeakerphoneOn())));
-        data.add(new Item2("Wired Headset Connected", String.valueOf(e.isWiredHeadsetConnected())));
-        data.add(new Item2("Supported Formats", TextUtils.join(", ", e.getSupportedFormats())));
-        data.add(new Item2("Supported Sources", TextUtils.join(", ", e.getSupportedSources())));
+        data.add(new ListItem2("Mode", e.getMode()));
+        data.add(new ListItem2("Ringer Mode", e.getRingerMode()));
+        data.add(new ListItem2("System Volume", e.getSystemVolume() + "/" + e.getSystemVolumeMax()));
+        data.add(new ListItem2("Ring Volume", e.getRingVolume() + "/" + e.getRingVolumeMax()));
+        data.add(new ListItem2("Call Volume", e.getCallVolume() + "/" + e.getCallVolumeMax()));
+        data.add(new ListItem2("Music Volume", e.getMusicVolume() + "/" + e.getMusicVolumeMax()));
+        data.add(new ListItem2("Alarm Volume", e.getAlarmVolume() + "/" + e.getAlarmVolumeMax()));
+        data.add(new ListItem2("DTMF Volume", e.getDtmfVolume() + "/" + e.getDtmfVolumeMax()));
+        data.add(new ListItem2("Notification Volume", e.getNotificationVolume() + "/" + e.getNotificationVolumeMax()));
+        data.add(new ListItem2("Ringer Vibrate", e.getRingerVibrateSetting()));
+        data.add(new ListItem2("Notification Vibrate", e.getNotificationVibrateSetting()));
+        data.add(new ListItem2("Bluetooth A2DP On", String.valueOf(e.isBluetoothA2dpOn())));
+        data.add(new ListItem2("Bluetooth SCO On", String.valueOf(e.isBluetoothScoOn())));
+        data.add(new ListItem2("Bluetooth SCO Available Off Call", String.valueOf(e.isBluetoothScoAvailableOffCall())));
+        data.add(new ListItem2("Microphone Muted", String.valueOf(e.isMicrophoneMute())));
+        data.add(new ListItem2("Music Active", String.valueOf(e.isMusicActive())));
+        data.add(new ListItem2("Speakerphone On", String.valueOf(e.isSpeakerphoneOn())));
+        data.add(new ListItem2("Wired Headset Connected", String.valueOf(e.isWiredHeadsetConnected())));
+        data.add(new ListItem2("Supported Formats", TextUtils.join(", ", e.getSupportedFormats())));
+        data.add(new ListItem2("Supported Sources", TextUtils.join(", ", e.getSupportedSources())));
         return data;
     }
 }
