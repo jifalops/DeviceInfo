@@ -22,21 +22,22 @@ public abstract class AbsCachedItem1 extends AbsItem implements Item1 {
 
     @Override
     public void setText(CharSequence text) {
-        mText = text;
-        if (mTextView != null) {
-            mTextView.setText(mText);
-        }
+//        mText = text;
+//        if (mTextView != null) {
+            mTextView.setText(text);
+//        }
     }
 
     @Override
     public CharSequence getText() {
-        return mText;
+//        return mText;
+        return mTextView.getText();
     }
 
     @Override
     public View getView(LayoutInflater inflater, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = inflater.inflate(mLayoutRes, parent, true);
+            convertView = inflater.inflate(mLayoutRes, parent, false);
         }
         mTextView = (TextView) convertView.findViewById(R.id.text);
         mTextView.setText(mText);

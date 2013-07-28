@@ -6,10 +6,12 @@ import android.hardware.SensorEvent;
 
 import com.deviceinfoapp.R;
 import com.deviceinfoapp.element.Sensors;
+import com.deviceinfoapp.element.Sensors.SensorWrapper;
 import com.deviceinfoapp.item.AbsCachedItem2;
 import com.deviceinfoapp.item.CachedSubItem2;
 import com.deviceinfoapp.item.ExpandableListHeader;
 import com.deviceinfoapp.item.Item;
+import com.deviceinfoapp.item.Item2;
 import com.deviceinfoapp.item.ListSubHeader;
 import com.deviceinfoapp.item.ListSubItem2;
 
@@ -17,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 /**
  * Created by Jake on 7/18/13.
  */
@@ -30,7 +31,7 @@ public class SensorsController extends ActiveElementController implements Sensor
         void onSensorChanged(SensorEvent event);
     }
 
-    private AbsCachedItem2
+    private Item2
             mWorldX,
             mWorldY,
             mWorldZ,
@@ -39,7 +40,7 @@ public class SensorsController extends ActiveElementController implements Sensor
             mHumidity,
             mHumidityAccuracy;
 
-    private Map<Sensor, AbsCachedItem2[]> mSensorMap;
+    private Map<SensorWrapper, Item2[]> mSensorMap;
 
     private boolean mHasAggregateData;
 
@@ -51,11 +52,11 @@ public class SensorsController extends ActiveElementController implements Sensor
         Sensors e = new Sensors(context, this);
         mElement = e;
 
-        List<Sensor> acc = e.getSensors(Sensors.TYPE_ACCELEROMETER);
-        List<Sensor> mag = e.getSensors(Sensors.TYPE_MAGNETIC_FIELD);
+        List<SensorWrapper> acc = e.getSensors(Sensors.TYPE_ACCELEROMETER);
+        List<SensorWrapper> mag = e.getSensors(Sensors.TYPE_MAGNETIC_FIELD);
 
-        List<Sensor> amb = e.getSensors(Sensors.TYPE_AMBIENT_TEMPERATURE);
-        List<Sensor> hum = e.getSensors(Sensors.TYPE_RELATIVE_HUMIDITY);
+        List<SensorWrapper> amb = e.getSensors(Sensors.TYPE_AMBIENT_TEMPERATURE);
+        List<SensorWrapper> hum = e.getSensors(Sensors.TYPE_RELATIVE_HUMIDITY);
 
         if (acc.size() > 0 && mag.size() > 0) {
             mHasAggregateData = true;
@@ -73,11 +74,11 @@ public class SensorsController extends ActiveElementController implements Sensor
             mHumidityAccuracy = new CachedSubItem2("Accuracy", "");
         }
 
-        Sensor[] sensors = e.getSensors();
+        SensorWrapper[] sensors = e.getSensors();
         int size = sensors.length;
 
-        mSensorMap = new HashMap<Sensor, AbsCachedItem2[]>();
-        AbsCachedItem2[] items = null;
+        mSensorMap = new HashMap<SensorWrapper, Item2[]>();
+        Item2[] items = null;
         int type;
         String unit;
         for (int i = 0; i < size; ++i) {
@@ -209,25 +210,25 @@ public class SensorsController extends ActiveElementController implements Sensor
     }
 
     private void addSensors(Sensors sensors, List<Item> data, int type, String usec, String mamp) {
-        List<Sensor> sensorList = sensors.getSensors(type);
+        List<SensorWrapper> sensorList = sensors.getSensors(type);
         if (sensorList.isEmpty()) return;
 
         data.add(new ExpandableListHeader(sensors.getSensorName(type)));
 
         String unit = sensors.getUnit(type);
         boolean first = true;
-        for (Sensor s : sensorList) {
-            for (Item item : mSensorMap.get(s)) {
+        for (SensorWrapper sw : sensorList) {
+            for (Item item : mSensorMap.get(sw)) {
                 data.add(item);
             }
-            data.add(new ListSubItem2("Name", s.getName()));
-            data.add(new ListSubItem2("Vendor", s.getVendor()));
-            data.add(new ListSubItem2("Version", String.valueOf(s.getVersion())));
+            data.add(new ListSubItem2("Name", sw.getSensor().getName()));
+            data.add(new ListSubItem2("Vendor", sw.getSensor().getVendor()));
+            data.add(new ListSubItem2("Version", String.valueOf(sw.getSensor().getVersion())));
             data.add(new ListSubItem2("Default", String.valueOf(first)));
-            data.add(new ListSubItem2("Power (" + mamp + ")", String.valueOf(s.getPower())));
-            data.add(new ListSubItem2("Resolution (" + unit + ")", String.valueOf(s.getResolution())));
-            data.add(new ListSubItem2("Max Range (" + unit + ")", String.valueOf(s.getMaximumRange())));
-            data.add(new ListSubItem2("Min Delay (" + usec + ")", String.valueOf(s.getMinDelay())));
+            data.add(new ListSubItem2("Power (" + mamp + ")", String.valueOf(sw.getSensor().getPower())));
+            data.add(new ListSubItem2("Resolution (" + unit + ")", String.valueOf(sw.getSensor().getResolution())));
+            data.add(new ListSubItem2("Max Range (" + unit + ")", String.valueOf(sw.getSensor().getMaximumRange())));
+            data.add(new ListSubItem2("Min Delay (" + usec + ")", String.valueOf(sw.getSensor().getMinDelay())));
             first = false;
         }
     }
@@ -243,23 +244,24 @@ public class SensorsController extends ActiveElementController implements Sensor
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        mSensorMap.get(sensor)[0].setText2(((Sensors) mElement).getAccuracy(accuracy));
-        ((Callbacks) mCallbacks).onAccuracyChanged(sensor, accuracy);
+    public void onAccuracyChanged(SensorWrapper sw) {
+        mSensorMap.get(sw)[0].setText2(((Sensors) mElement).getAccuracy(sw.getAccuracy()));
+//        ((Callbacks) mCallbacks).onAccuracyChanged(sensor, accuracy);
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorWrapper sw) {
         Sensors s = (Sensors) mElement;
-        String acc = s.getAccuracy(event.accuracy);
-        mSensorMap.get(event.sensor)[0].setText2(acc);
-        AbsCachedItem2[] items = mSensorMap.get(event.sensor);
-        for (int i = 1, len1 = items.length, len2 = event.values.length + 1; i < len1 && i < len2; ++i) {
-            items[i].setText2(String.valueOf(event.values[i - 1]));
+        String acc = s.getAccuracy(sw.getAccuracy());
+        Item2[] items = mSensorMap.get(sw);
+        items[0].setText2(acc);
+        float[] values = sw.getValues();
+        for (int i = 1, len1 = items.length, len2 = values.length + 1; i < len1 && i < len2; ++i) {
+            items[i].setText2(String.valueOf(values[i - 1]));
         }
 
         if (mHasAggregateData) {
-            switch (event.sensor.getType()) {
+            switch (sw.getType()) {
                 case Sensors.TYPE_ACCELEROMETER:
                 case Sensors.TYPE_MAGNETIC_FIELD:
                     float[] coords = s.getOrientationInWorldCoordinateSystem();
@@ -279,6 +281,6 @@ public class SensorsController extends ActiveElementController implements Sensor
             }
         }
 
-        ((Callbacks) mCallbacks).onSensorChanged(event);
+//        ((Callbacks) mCallbacks).onSensorChanged(sw);
     }
 }

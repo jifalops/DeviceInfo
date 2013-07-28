@@ -15,6 +15,7 @@ public abstract class ActiveElement extends AbsElement {
 
 	protected Callbacks mCallbacks;
     protected boolean mIsActive;
+    private boolean mIsThrottled;
     private long[] mActionTimestamps;
     private int[] mActionThrottles;
 
@@ -45,6 +46,7 @@ public abstract class ActiveElement extends AbsElement {
 
 
     public boolean isActionAllowed(int action) {
+        if (!mIsThrottled) return true;
         return mActionThrottles[action] < (System.currentTimeMillis() - mActionTimestamps[action]);
     }
 
@@ -64,5 +66,13 @@ public abstract class ActiveElement extends AbsElement {
 
     public int getActionThrottle(int action) {
         return mActionThrottles[action];
+    }
+
+    public boolean isThrottled() {
+        return mIsThrottled;
+    }
+
+    public void setIsThrottled(boolean throttled) {
+        mIsThrottled = throttled;
     }
 }

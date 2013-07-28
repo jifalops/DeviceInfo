@@ -23,34 +23,36 @@ public abstract class AbsCachedItem2 extends AbsItem implements Item2 {
 
     @Override
     public void setText1(CharSequence text1) {
-        mText1 = text1;
-        if (mTextView1 != null) {
-            mTextView1.setText(mText1);
-        }
+//        mText1 = text1;
+//        if (mTextView1 != null) {
+            mTextView1.setText(text1);
+//        }
     }
 
     @Override
     public CharSequence getText1() {
-        return mText1;
+//        return mText1;
+        return mTextView1.getText();
     }
 
     @Override
     public void setText2(CharSequence text2) {
-        mText2 = text2;
-        if (mTextView2 != null) {
+//        mText2 = text2;
+//        if (mTextView2 != null) {
             mTextView2.setText(mText2);
-        }
+//        }
     }
 
     @Override
     public CharSequence getText2() {
-        return mText2;
+//        return mText2;
+        return mTextView2.getText();
     }
 
     @Override
     public View getView(LayoutInflater inflater, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = inflater.inflate(mLayoutRes, parent, true);
+            convertView = inflater.inflate(mLayoutRes, parent, false);
         }
         mTextView1 = (TextView) convertView.findViewById(R.id.text1);
         mTextView2 = (TextView) convertView.findViewById(R.id.text2);

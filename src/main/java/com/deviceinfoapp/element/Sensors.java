@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // TODO add microphone
-public class Sensors extends ActiveElement implements SensorEventListener {
+public class Sensors extends ActiveElement {
 	private static final String LOG_TAG = Sensors.class.getSimpleName();
 	
 	public static final int
@@ -73,9 +73,9 @@ public class Sensors extends ActiveElement implements SensorEventListener {
 
     public interface Callbacks extends ActiveElement.Callbacks {
 		/** Corresponds to SensorEventListener.onAccuracyChanged() */
-		void onAccuracyChanged(Sensor sensor, int accuracy);
+		void onAccuracyChanged(SensorWrapper sw);
 		/** Corresponds to SensorEventListener.onSensorChanged() */
-		void onSensorChanged(SensorEvent event);
+		void onSensorChanged(SensorWrapper sw);
 	}
 
     public final String
@@ -124,9 +124,9 @@ public class Sensors extends ActiveElement implements SensorEventListener {
     
 	private SensorManager mSensorManager;
     
-    private Sensor[] mSensors;
+    private SensorWrapper[] mSensors;
 
-    private List<Sensor> 
+    private List<SensorWrapper> 
         mAccelerometerSensors,
         mAmbientTemperatureSensors,
         mGravitySensors,
@@ -211,19 +211,19 @@ public class Sensors extends ActiveElement implements SensorEventListener {
 //        setActionThrottle(ACTION_TEMPERATURE_ACCURACY, FREQUENCY_LOW);
 //        setActionThrottle(ACTION_TEMPERATURE_EVENT, FREQUENCY_LOW);
 
-        mAccelerometerSensors = new ArrayList<Sensor>();
-        mAmbientTemperatureSensors = new ArrayList<Sensor>();
-        mGravitySensors = new ArrayList<Sensor>();
-        mGyroscopeSensors = new ArrayList<Sensor>();
-        mLightSensors = new ArrayList<Sensor>();
-        mLinearAccelerationSensors = new ArrayList<Sensor>();
-        mMagneticFieldSensors = new ArrayList<Sensor>();
-        mOrientationSensors = new ArrayList<Sensor>();
-        mPressureSensors = new ArrayList<Sensor>();
-        mProximitySensors = new ArrayList<Sensor>();
-        mRelativeHumiditySensors = new ArrayList<Sensor>();
-        mRotationVectorSensors = new ArrayList<Sensor>();
-        mTemperatureSensors = new ArrayList<Sensor>();
+        mAccelerometerSensors = new ArrayList<SensorWrapper>();
+        mAmbientTemperatureSensors = new ArrayList<SensorWrapper>();
+        mGravitySensors = new ArrayList<SensorWrapper>();
+        mGyroscopeSensors = new ArrayList<SensorWrapper>();
+        mLightSensors = new ArrayList<SensorWrapper>();
+        mLinearAccelerationSensors = new ArrayList<SensorWrapper>();
+        mMagneticFieldSensors = new ArrayList<SensorWrapper>();
+        mOrientationSensors = new ArrayList<SensorWrapper>();
+        mPressureSensors = new ArrayList<SensorWrapper>();
+        mProximitySensors = new ArrayList<SensorWrapper>();
+        mRelativeHumiditySensors = new ArrayList<SensorWrapper>();
+        mRotationVectorSensors = new ArrayList<SensorWrapper>();
+        mTemperatureSensors = new ArrayList<SensorWrapper>();
 
         List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
 
@@ -238,7 +238,7 @@ public class Sensors extends ActiveElement implements SensorEventListener {
                 addSensor(s);
         }
 
-        List<Sensor> list = new ArrayList<Sensor>();
+        List<SensorWrapper> list = new ArrayList<SensorWrapper>();
         list.addAll(mAccelerometerSensors);
         list.addAll(mAmbientTemperatureSensors);
         list.addAll(mGravitySensors);
@@ -252,28 +252,29 @@ public class Sensors extends ActiveElement implements SensorEventListener {
         list.addAll(mRelativeHumiditySensors);
         list.addAll(mRotationVectorSensors);
         list.addAll(mTemperatureSensors);
-        mSensors = list.toArray(new Sensor[list.size()]);
+        mSensors = list.toArray(new SensorWrapper[list.size()]);
 	}
 
     private void addSensor(Sensor s) {
+        SensorWrapper sw = new SensorWrapper(mSensorManager, s, (Callbacks) mCallbacks);
         switch (s.getType()) {
-        case TYPE_ACCELEROMETER:            mAccelerometerSensors.add(s);           break;
-        case TYPE_AMBIENT_TEMPERATURE:      mAmbientTemperatureSensors.add(s);      break;
-        case TYPE_GRAVITY:                  mGravitySensors.add(s);                 break;
-        case TYPE_GYROSCOPE:                mGyroscopeSensors.add(s);               break;
-        case TYPE_LIGHT:                    mLightSensors.add(s);                   break;
-        case TYPE_LINEAR_ACCELERATION:      mLinearAccelerationSensors.add(s);      break;
-        case TYPE_MAGNETIC_FIELD:           mMagneticFieldSensors.add(s);           break;
-        case TYPE_ORIENTATION:              mOrientationSensors.add(s);             break;
-        case TYPE_PRESSURE:                 mPressureSensors.add(s);                break;
-        case TYPE_PROXIMITY:                mProximitySensors.add(s);               break;
-        case TYPE_RELATIVE_HUMIDITY:        mRelativeHumiditySensors.add(s);        break;
-        case TYPE_ROTATION_VECTOR:          mRotationVectorSensors.add(s);          break;
-        case TYPE_TEMPERATURE:              mTemperatureSensors.add(s);             break;
+        case TYPE_ACCELEROMETER:            mAccelerometerSensors.add(sw);           break;
+        case TYPE_AMBIENT_TEMPERATURE:      mAmbientTemperatureSensors.add(sw);      break;
+        case TYPE_GRAVITY:                  mGravitySensors.add(sw);                 break;
+        case TYPE_GYROSCOPE:                mGyroscopeSensors.add(sw);               break;
+        case TYPE_LIGHT:                    mLightSensors.add(sw);                   break;
+        case TYPE_LINEAR_ACCELERATION:      mLinearAccelerationSensors.add(sw);      break;
+        case TYPE_MAGNETIC_FIELD:           mMagneticFieldSensors.add(sw);           break;
+        case TYPE_ORIENTATION:              mOrientationSensors.add(sw);             break;
+        case TYPE_PRESSURE:                 mPressureSensors.add(sw);                break;
+        case TYPE_PROXIMITY:                mProximitySensors.add(sw);               break;
+        case TYPE_RELATIVE_HUMIDITY:        mRelativeHumiditySensors.add(sw);        break;
+        case TYPE_ROTATION_VECTOR:          mRotationVectorSensors.add(sw);          break;
+        case TYPE_TEMPERATURE:              mTemperatureSensors.add(sw);             break;
         }
     }
 
-    public List<Sensor> getSensors(int type) {
+    public List<SensorWrapper> getSensors(int type) {
         switch (type) {
         case TYPE_ACCELEROMETER:            return mAccelerometerSensors;
         case TYPE_AMBIENT_TEMPERATURE:      return mAmbientTemperatureSensors;
@@ -315,7 +316,7 @@ public class Sensors extends ActiveElement implements SensorEventListener {
         return mSensorManager;
     }
 
-    public Sensor[] getSensors() {
+    public SensorWrapper[] getSensors() {
         return mSensors;
     }
 
@@ -415,7 +416,73 @@ public class Sensors extends ActiveElement implements SensorEventListener {
 //    }
 
 
-    //
+
+    public static class SensorWrapper implements SensorEventListener {
+        private final Sensor mSensor;
+        private boolean mIsActive;
+        protected float[] mValues;
+        private int mAccuracy;
+        private SensorManager mSensorManager;
+        private int mThrottle;
+        private Callbacks mCallbacks;
+        private int mType;
+
+        public SensorWrapper(SensorManager sensorManager, Sensor sensor, Callbacks callbacks) {
+            mSensorManager = sensorManager;
+            mSensor = sensor;
+            mCallbacks = callbacks;
+            mType = sensor.getType();
+        }
+
+        public Sensor getSensor() {
+            return mSensor;
+        }
+
+        public int getAccuracy() {
+            return mAccuracy;
+        }
+
+        public float[] getValues() {
+            return mValues;
+        }
+
+        public int getType() {
+            return mType;
+        }
+
+        public void setThrottle(int millis) {
+            mThrottle = millis;
+        }
+
+        public void start() {
+            if (mIsActive) return;
+            mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_UI);
+            mIsActive = true;
+        }
+
+        public void stop() {
+            if (!mIsActive) return;
+            mSensorManager.unregisterListener(this);
+            mIsActive = false;
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            mAccuracy = accuracy;
+            mCallbacks.onAccuracyChanged(this);
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            mAccuracy = event.accuracy;
+            mValues = event.values.clone();
+            mCallbacks.onSensorChanged(this);
+        }
+    }
+
+
+
+        //
     // Aggregate sensor info
     //
 
@@ -448,54 +515,64 @@ public class Sensors extends ActiveElement implements SensorEventListener {
 		return (float) (216.7 * (rh / 100.0 * 6.112 * Math.exp(17.62 * t / (243.12 + t)) / (273.15 + t)));
 	}
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-//        int action = getAccuracyAction(sensor.getType());
-        if (!isActionAllowed(ACTION_SENSOR_ACCURACY)) return;
+//    @Override
+//    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+////        int action = getAccuracyAction(sensor.getType());
+//        if (!isActionAllowed(ACTION_SENSOR_ACCURACY)) return;
+//
+//        // TODO other classes implement these in the opposite order.
+//        ((Callbacks) mCallbacks).onAccuracyChanged(sensor, accuracy);
+//        setActionTime(ACTION_SENSOR_ACCURACY);
+//    }
 
-        // TODO other classes implement these in the opposite order.
-        ((Callbacks) mCallbacks).onAccuracyChanged(sensor, accuracy);
-        setActionTime(ACTION_SENSOR_ACCURACY);
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-//        int action = getEventAction(event.sensor.getType());
-        if (!isActionAllowed(ACTION_SENSOR_EVENT)) return;
-
-        switch (event.sensor.getType()) {
-            case TYPE_ACCELEROMETER:
-                mAccelerometerValues = event.values.clone();
-                break;
-            case TYPE_MAGNETIC_FIELD:
-                mMagneticFieldValues = event.values.clone();
-                break;
-            case TYPE_AMBIENT_TEMPERATURE:
-                mAmbientTemperatureValues = event.values.clone();
-                break;
-            case TYPE_RELATIVE_HUMIDITY:
-                mRelativeHumidityValues = event.values.clone();
-                break;
-        }
-
-        // TODO other classes implement these in the opposite order.
-        ((Callbacks) mCallbacks).onSensorChanged(event);
-        setActionTime(ACTION_SENSOR_EVENT);
-    }
+//    @Override
+//    public void onSensorChanged(SensorEvent event) {
+////        int action = getEventAction(event.sensor.getType());
+//        if (!isActionAllowed(ACTION_SENSOR_EVENT)) return;
+//
+//        switch (event.sensor.getType()) {
+//            case TYPE_ACCELEROMETER:
+//                mAccelerometerValues = event.values.clone();
+//                break;
+//            case TYPE_MAGNETIC_FIELD:
+//                mMagneticFieldValues = event.values.clone();
+//                break;
+//            case TYPE_AMBIENT_TEMPERATURE:
+//                mAmbientTemperatureValues = event.values.clone();
+//                break;
+//            case TYPE_RELATIVE_HUMIDITY:
+//                mRelativeHumidityValues = event.values.clone();
+//                break;
+//        }
+//
+//        // TODO other classes implement these in the opposite order.
+//        ((Callbacks) mCallbacks).onSensorChanged(event);
+//        setActionTime(ACTION_SENSOR_EVENT);
+//    }
 	
 	@Override
 	public void start() {
 		if (mIsActive) return;
-        for (Sensor s : mSensorManager.getSensorList(Sensor.TYPE_ALL)) {
-            mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_UI);
+//        for (Sensor s : mSensorManager.getSensorList(Sensor.TYPE_ALL)) {
+//            mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_UI);
+//        }
+
+        for (SensorWrapper sw : mSensors) {
+            sw.start();
         }
+
         mIsActive = true;
 	}
 	
 	@Override
 	public void stop() {
-		
-        mSensorManager.unregisterListener(this);
+
+//        mSensorManager.unregisterListener(this);
+
+        for (SensorWrapper sw : mSensors) {
+            sw.stop();
+        }
+
 		mIsActive = false;
     }
 

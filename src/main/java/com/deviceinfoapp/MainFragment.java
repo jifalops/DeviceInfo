@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.deviceinfoapp.controller.AbsElementController;
@@ -51,8 +52,11 @@ import com.deviceinfoapp.controller.StorageController;
 import com.deviceinfoapp.controller.UptimeController;
 import com.deviceinfoapp.controller.WifiController;
 import com.deviceinfoapp.data.Elements;
+import com.deviceinfoapp.item.AbsListItem1;
+import com.deviceinfoapp.item.AbsListItem2;
 import com.deviceinfoapp.item.Item;
 import com.deviceinfoapp.item.ItemExpandableListAdapter;
+import com.deviceinfoapp.item.ListItem;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -90,8 +94,11 @@ public class MainFragment
     private boolean mIsShowing;
     private boolean mPlayImmediately;
 
-    private ItemExpandableListAdapter mAdapter;
-    protected ExpandableListView mListView;
+    private ItemExpandableListAdapter mExpandableAdapter;
+    private ExpandableListView mListView;
+
+    private List<Item> mItems;
+    private LinearLayout mLinearLayout;
 
     private boolean mIsVisibleInPager;
 
@@ -137,6 +144,14 @@ public class MainFragment
         View root = null;
 
         if (mController.usesCachedViews()) {
+            mItems = mController.getData();
+
+            root = inflater.inflate(R.layout.fragment_item_detail_cached, container, false);
+            mLinearLayout = (LinearLayout) root.findViewById(R.id.list);
+
+            for (int i = 0, len = mItems.size(); i < len; ++i) {
+                mLinearLayout.addView(mItems.get(i).getView(inflater, null, null));
+            }
 
         } else {
             root = inflater.inflate(R.layout.fragment_item_detail, container, false);
@@ -144,10 +159,10 @@ public class MainFragment
             mListView = (ExpandableListView) root.findViewById(R.id.list);
             mListView.setGroupIndicator(null);
 
-            mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
-            mListView.setAdapter(mAdapter);
+            mExpandableAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
+            mListView.setAdapter(mExpandableAdapter);
 
-            for (int i = 0; i < mAdapter.getGroupCount(); ++i) {
+            for (int i = 0; i < mExpandableAdapter.getGroupCount(); ++i) {
                 mListView.expandGroup(i);
             }
         }
@@ -265,16 +280,19 @@ public class MainFragment
 
     @Override
     public void onAction(int action) {
-//        mAdapter.notifyDataSetChanged();
+//        showIndicator();
+//        if (mController.usesCachedViews()) return;
+
+//        mExpandableAdapter.notifyDataSetChanged();
 //        mListView.invalidate();
 
-//        mAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
-//        mListView.setAdapter(mAdapter);
+//        mExpandableAdapter = new ItemExpandableListAdapter(getActivity(), mController.getData());
+//        mListView.setAdapter(mExpandableAdapter);
 //        mListView.expandGroup(0);
 
-        listVisibleRowsForExpandableGroup();
-//        mAdapter.notifyDataSetChanged();
-        showIndicator();
+//        listVisibleRowsForExpandableGroup();
+//        mExpandableAdapter.notifyDataSetChanged();
+
 
         // vvv  Do using ActiveElementController?
         // TODO when this is called (up to fragment), update visible views
@@ -289,7 +307,7 @@ public class MainFragment
 
         int count = firstVis;
 
-        Item item = null;
+        ListItem item = null;
         TextView tv = null;
         while (count <= lastVis)
         {
@@ -300,15 +318,15 @@ public class MainFragment
                 int childPosition = mListView.getPackedPositionChild(longposition);
                 Log.d("Test", "group: " + groupPosition + " and child: " + childPosition);
 
-                item = (Item) mAdapter.getChild(groupPosition, childPosition);
+                item = (ListItem) mExpandableAdapter.getChild(groupPosition, childPosition);
                 if (item.hasChanged()) {
-                    if (item instanceof AbsItem1) {
+                    if (item instanceof AbsListItem1) {
                         tv = (TextView) mListView.getChildAt(count).findViewById(R.id.text);
-                        tv.setText(((AbsItem1) item).getText());
+                        tv.setText(((AbsListItem1) item).getText());
                     }
-                    else if (item instanceof AbsItem2) {
+                    else if (item instanceof AbsListItem2) {
                         tv = (TextView) mListView.getChildAt(count).findViewById(R.id.text2);
-                        tv.setText(((AbsItem2) item).getText2());
+                        tv.setText(((AbsListItem2) item).getText2());
                     }
                     item.setHasChanged(false);
                 }
