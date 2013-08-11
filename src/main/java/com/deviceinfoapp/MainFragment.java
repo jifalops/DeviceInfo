@@ -136,6 +136,12 @@ public class MainFragment
             return null;
         }
 
+        if (mController instanceof SensorsController) {
+            startActivity(new Intent(getActivity(), TestActivity.class));
+            getActivity().finish();
+            return null;
+        }
+
         if (mController instanceof ActiveElementController) {
             mIsActionable = ((ActiveElementController) mController).isActionable();
             mPlayImmediately = false;
